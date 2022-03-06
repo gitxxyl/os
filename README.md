@@ -1,6 +1,4 @@
 # [redacted]os
-[redacted]os - a hobbyist x86_64 operating system kernel.
-
 _NOTE: This kernel is still in early stages of development - check back after a few months to see a potentially usable OS._
 _It lacks proper documentation and a proper license, but for now, just don't copy anything from here without asking me._
 
