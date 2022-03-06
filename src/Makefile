@@ -55,6 +55,10 @@ all: $(KERNEL)
 	../iso.sh
 	qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M
 	make clean -s
+gdb: $(KERNEL)
+	../iso.sh
+	qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M -s -S
+	make clean -s
 
 stivale2.h:
 	curl https://raw.githubusercontent.com/stivale/stivale/master/stivale2.h -o $@
