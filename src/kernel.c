@@ -2,7 +2,9 @@
 #include <stddef.h>
 #include <stivale2.h>
 #include <include/common.h>
-
+#include <lib/math.h>
+#include <cpuid.h>
+#include <lib/printf.h>
 // We need to tell the stivale bootloader where we want our stack to be.
 // We are going to allocate our stack as an array in .bss.
 static uint8_t stack[8192];
@@ -16,13 +18,18 @@ static uint8_t stack[8192];
 // especially during early boot.
 // Read the notes about the requirements for using this feature below this
 // code block.
+
+static struct stivale2_tag paging_hdr_tag = {
+    .identifier = STIVALE2_HEADER_TAG_5LV_PAGING_ID,
+    .next = 0
+};
 static struct stivale2_header_tag_terminal terminal_hdr_tag = {
     // All tags need to begin with an identifier and a pointer to the next tag.
     .tag = {
         // Identification constant defined in stivale2.h and the specification.
         .identifier = STIVALE2_HEADER_TAG_TERMINAL_ID,
         // If next is 0, it marks the end of the linked list of header tags.
-        .next = 0},
+        .next = (uint64_t)&paging_hdr_tag},
     // The terminal header tag possesses a flags field, leave it as 0 for now
     // as it is unused.
     .flags = 0};
@@ -76,7 +83,7 @@ __attribute__((section(".stivale2hdr"), used)) static struct stivale2_header sti
 // that we want FROM the bootloader (structure tags).
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
 {
-    struct stivale2_tag *current_tag = (void *)stivale2_struct->tags;
+    struct stivale2_tag *current_tag = (void*) stivale2_struct->tags;
     for (;;)
     {
         // If the tag pointer is NULL (end of linked list), we did not find
@@ -94,9 +101,12 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
         }
 
         // Get a pointer to the next tag in the linked list and repeat.
-        current_tag = (void *)current_tag->next;
+        current_tag = (void*) current_tag->next;
     }
 }
+
+extern void sse_init();
+char* dtoa(float f);
 
 // The following will be our kernel's entry point.
 void _start(struct stivale2_struct *stivale2_struct)
@@ -112,18 +122,28 @@ void _start(struct stivale2_struct *stivale2_struct)
     fb_print("Keyboard initialised.\n");
     timer_init(1000);
     fb_print("Timer initialised.\n");
+    
     sprint("\n\n[REDACTED]OS v0.2 booted successfully on Limine v");
     sprint(stivale2_struct->bootloader_version);
     sprint("\n");
 
+    sprint(itoa(pow(2,2), 10));
+
     fb_print("\nMemory map information:\n");
     pmm_init(stivale2_struct);
 
+    get_cpuid();
+    fb_print("\nSSE: ");
+    if(check_sse()){
+        fb_print("Present\n");
+        sse_init();
+    } else {
+        fb_print("Not present\n");
+    }
     fb_print_color("\n\n[REDACTED]OS v0.2 booted successfully on Limine v", 0x00FF00);
     fb_print_color(stivale2_struct->bootloader_version, 0x00FF00);
     
     fb_print("\nInterrupts enabled, system ready.\n"); 
-
     // No more proactive code from here, all initialization must be completed
     asm ("sti");
     

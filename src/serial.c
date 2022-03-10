@@ -31,6 +31,9 @@ void sputch(char a){
     while(is_transmit_empty()==0);
     outb(PORT, a);
 }
+void _dputchar(char character){
+    sputch(character);
+}
 void sprint(char* text){
     uint32_t i;
 

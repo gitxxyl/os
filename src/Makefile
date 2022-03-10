@@ -52,38 +52,36 @@ override HEADER_DEPS := $(CFILES:.c=.d)
 # Default target.
 .PHONY: all
 all: $(KERNEL)
-	../iso.sh
-	qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M
-	make clean -s
+	@../iso.sh
+	@qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M
+	@make clean -s
 gdb: $(KERNEL)
-	../iso.sh
-	qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M -s -S
-	make clean -s
+	@../iso.sh
+	@qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M -s -S
+	@make clean -s
 
 stivale2.h:
 	curl https://raw.githubusercontent.com/stivale/stivale/master/stivale2.h -o $@
 
 # Link rules for the final kernel executable.
 $(KERNEL): $(OBJ)
-	$(LD) -r -b binary -o sfn_fonts/font_unifont.o sfn_fonts/unifont.sfn
-	$(LD) sfn_fonts/font_unifont.o $(OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@
+	@$(LD) -r -b binary -o sfn_fonts/font_unifont.o sfn_fonts/unifont.sfn
+	@$(LD) sfn_fonts/font_unifont.o $(OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@
 
 # Compilation rules for *.c files.
 
 %.o: %.asm 
-	nasm -felf64 $< -o $@
+	@nasm -felf64 $< -o $@
 
 # -include $(HEADER_DEPS)
 %.o: %.c stivale2.h
-	$(CC) $(CFLAGS) $(INTERNALCFLAGS) -c $< -o $@
-
-
+	@$(CC) $(CFLAGS) $(INTERNALCFLAGS) -c $< -o $@
 
 # Remove object files and the final executable.
 .PHONY: clean
 clean:
-	rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) # image.iso
+	@rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) # image.iso
 
 .PHONY: distclean
 distclean: clean
-	rm -f stivale2.h
+	@rm -f stivale2.h

@@ -1,15 +1,17 @@
 /**
  * pmm.c - Physical Memory Manager
- * Parses memory map and allocates pages using 5 level paging setup by Limine.
+ * Parses memory map and allocates pages using a bitmap.
  * functions - alloc_pages(), free_pages()
  **/
 
 #include <stivale2.h>
 #include <stddef.h>
 #include <include/common.h>
-
+#include <include/bitmap.h>
 
 static uint64_t detected_memory = 0;
+bitmap_t bmp; 
+
 void pmm_init(struct stivale2_struct* stivale2_struct){
     struct stivale2_struct_tag_memmap* mmap_tag;
     mmap_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MEMMAP_ID);
@@ -58,6 +60,23 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
     fb_print("Total: 0x");
     fb_print(itoa(detected_memory, 16));
 
-    
+    uint64_t cr0;
+    asm("movq %%cr0, %0": "=r"(cr0));
+    fb_print("\ncr0 set bits: ");
+    fb_print_bits(cr0);
+
+    uint64_t cr4;
+    asm("movq %%cr4, %0": "=r"(cr4));
+    fb_print("\ncr4 set bits: ");
+    fb_print_bits(cr4);
+
+    uint64_t bits = detected_memory / 0x1000;
+    uint64_t bitmap_byte_size = bits / 8;
+    bmp.size = bitmap_byte_size;
+
+    fb_print("\nbitmap size: ");
+    fb_print(itoa(bitmap_byte_size, 10));
 }
+
+
 

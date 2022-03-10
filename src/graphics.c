@@ -1,3 +1,11 @@
+/**
+ * CGA Framebuffer driver with SSFN font and 24 bit color.
+ * https://wiki.osdev.org/Scalable_Screen_Font 
+ * functions: graphics_init(), fb_plotpixel(), fb_changebg(), fb_printchar(), fb_print(), fb_print_color(), fb_print_bits()
+ **/
+
+
+
 #include <stivale2.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -91,6 +99,11 @@ void fb_printchar(char c){
             break;
     }
 }
+
+void _putchar(char character){
+    fb_printchar(character);
+}
+
 void fb_print(char* str){
     for(int i = 0; i < strlen(str); i++){
         fb_printchar(str[i]);
@@ -102,6 +115,15 @@ void fb_print_color(char* str, uint32_t color){
     ssfn_dst.fg = color;
     fb_print(str);
     ssfn_dst.fg = tmp;
+}
+
+void fb_print_bits(uint64_t cr){
+    for(int i = 0; i < 64; i++){
+        if((cr >> i) & 1){
+            fb_print(itoa(i, 10));
+            fb_print(" ");
+        }
+    }
 }
 
 void fb_lgbt(){
