@@ -1,5 +1,6 @@
 #include <include/port.h>
 #include <stdint.h>
+#include <lib/string.h>
 
 #define PORT 0x3f8 // serial COM1 port
 
@@ -35,9 +36,7 @@ void _dputchar(char character){
     sputch(character);
 }
 void sprint(char* text){
-    uint32_t i;
-
-    for (i = 0; i < strlen(text); i++)
+    for (uint32_t i = 0; i < strlen(text); i++)
     {
         sputch(text[i]);
     }

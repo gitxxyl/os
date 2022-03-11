@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
-typedef struct {
+typedef struct bitmap{
     uint8_t* map;
     size_t size;
 } bitmap_t;

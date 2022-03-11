@@ -1,12 +1,14 @@
 #include <stdint.h>
 #include <stddef.h>
-#include <stivale2.h>
+#include <include/stivale_tag.h>
+#include <lib/string.h>
+#include <thirdparty/stivale2.h>
 
 
 void (*term_write)(const char *string, size_t length);
 void vga_init(struct stivale2_struct* st_struct){
     struct stivale2_struct_tag_terminal *term_str_tag;
-    term_str_tag = stivale2_get_tag(st_struct, STIVALE2_STRUCT_TAG_TERMINAL_ID);
+    term_str_tag = (struct stivale2_struct_tag_terminal*) stivale2_get_tag(st_struct, STIVALE2_STRUCT_TAG_TERMINAL_ID);
 
     if (term_str_tag == NULL) { // check if term tag is there
         for (;;) {

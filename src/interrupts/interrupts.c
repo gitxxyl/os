@@ -1,6 +1,9 @@
 #include <include/interrupts.h>
+#include <include/serial.h>
+#include <include/port.h>
 #include <stdint.h>
-#include <include/common.h>
+
+#include <lib/string.h>
 
 void load_idt();
 void load_isr();

@@ -35,6 +35,7 @@
 #include <stddef.h>
 
 #include <lib/printf.h>
+#include <include/graphics.h>
 
 
 // define this globally (e.g. gcc -DPRINTF_INCLUDE_CONFIG_H ...) to include the
@@ -876,6 +877,18 @@ int printf_(const char* format, ...)
   char buffer[1];
   const int ret = _vsnprintf(_out_char, buffer, (size_t)-1, format, va);
   va_end(va);
+  return ret;
+}
+int printf_c_(int color, const char* format, ...)
+{
+  uint32_t tmpc = fb_getfg();
+  fb_changefg(color);
+  va_list va;
+  va_start(va, format);
+  char buffer[1];
+  const int ret = _vsnprintf(_out_char, buffer, (size_t)-1, format, va);
+  va_end(va);
+  fb_changefg(tmpc);
   return ret;
 }
 

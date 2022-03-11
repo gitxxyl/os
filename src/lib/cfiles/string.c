@@ -37,27 +37,3 @@ char* itoa(uint64_t num, uint64_t base) {
 
   return str;
 }
-
-char* dtoa(float f){
-    char result[100];
-    int dVal, dec, i;
-
-    f += 0.005;   // added after a comment from Matt McNabb, see below.
-
-    dVal = f;
-    dec = (int)(f * 100) % 100;
-
-    memset(result, 0, 100);
-    result[0] = (dec % 10) + '0';
-    result[1] = (dec / 10) + '0';
-    result[2] = '.';
-
-    i = 3;
-    while (dVal > 0)
-    {
-        result[i] = (dVal % 10) + '0';
-        dVal /= 10;
-        i++;
-    }
-    return result;
-}
