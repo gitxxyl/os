@@ -14,7 +14,7 @@ endif
 AS := x86_64-elf-as
 
 # User controllable CFLAGS.
-CFLAGS ?= -O2 -g -Wall -Wextra -pipe -nostdlib -Wno-unused-parameter -Wno-int-to-pointer-cast
+CFLAGS ?= -O2 -g -Wall -Wextra -pipe -nostdlib -Wno-implicit
 
 # User controllable linker flags. We set none by default.
 LDFLAGS ?=

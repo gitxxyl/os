@@ -5,6 +5,7 @@
 #define LIMINE_CS 0x28
 #define IDT_ENTRIES 256
 #define IDT_FLAGS 0x8E
+typedef void (*handler_t)(registers_t);
 
 typedef struct {
     uint16_t offset_lo;
@@ -49,10 +50,6 @@ typedef struct {
     uint64_t rsp;
     uint64_t ss;
 } registers_t;
-
-typedef void (*handler_t)(registers_t*);
-void isr_install_handler(uint32_t, handler_t);
-
 extern void isr0();
 extern void isr1();
 extern void isr2();

@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-uint64_t pow(uint64_t base, int64_t exp){
+uint64_t pow(uint64_t base, uint64_t exp){
     if(exp < 0){
         base = 1/base;
         exp = -exp;

@@ -6,14 +6,13 @@
 
 
 
-#include <thirdparty/stivale2.h>
+#include <stivale2.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <include/framebuffer.h>
-#include <include/stivale_tag.h>
-#include <lib/string.h> 
-#include <include/serial.h>
-#include <thirdparty/ssfn.h>
+#include <include/common.h>
+#define SSFN_CONSOLEBITMAP_TRUECOLOR   
+#include <ssfn.h>
 
 #define CHARACTER_WIDTH 8
 #define CHARACTER_HEIGHT 16 
@@ -23,10 +22,9 @@ struct fb_struct fb;
 
 extern uint8_t _binary_sfn_fonts_unifont_sfn_start;
 
-void fb_changebg(uint32_t color);
 void graphics_init(struct stivale2_struct *stivale2_struct, uint32_t bgcolor, uint32_t fgcolor){
     struct stivale2_struct_tag_framebuffer* framebuffer_tag;
-    framebuffer_tag = (struct stivale2_struct_tag_framebuffer*) stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
+    framebuffer_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     if (framebuffer_tag == NULL) { // check if framebuffer tag is there
         for (;;) {
             asm ("hlt");
@@ -70,13 +68,7 @@ void fb_changebg(uint32_t color){
         }
     }
 }
-void fb_changefg(uint32_t color){
-    ssfn_dst.fg = color;
-}
 
-uint32_t fb_getfg(){
-    return ssfn_dst.fg;
-}
 void fb_printchar(char c){
     switch(c){
         case '\n':
@@ -113,7 +105,7 @@ void _putchar(char character){
 }
 
 void fb_print(char* str){
-    for(uint32_t i = 0; i < strlen(str); i++){
+    for(int i = 0; i < strlen(str); i++){
         fb_printchar(str[i]);
     }   
 }

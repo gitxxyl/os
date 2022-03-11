@@ -1,7 +1,8 @@
 #include <include/port.h>
 #include <include/interrupts.h>
-#include <include/graphics.h>
 #include <stdint.h>
+
+// FIXME messy, needs cleaning 
 
 // scancode : key map for US keyboard
 unsigned char kbdus[128] = {
@@ -85,13 +86,13 @@ uint8_t ctrl = 0;
 uint8_t alt = 0;
 uint8_t capslock = 0;
 
-void keyboard_handler(registers_t* r){
+void keyboard_handler(registers_t r){
     //sprint("\n\nyo");
     unsigned char scancode;
-    scancode = inb(0x60);
     if (scancode == 0xE0){
       return;
     }
+    scancode = inb(0x60);
 
     if (scancode & 0x80)
     {
