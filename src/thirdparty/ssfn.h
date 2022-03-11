@@ -31,6 +31,7 @@
 #ifndef _SSFN_H_
 #define _SSFN_H_
 
+#define SSFN_CONSOLEBITMAP_TRUECOLOR  
 #define SSFN_VERSION 0x0200
 
 #ifdef  __cplusplus

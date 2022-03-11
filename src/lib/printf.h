@@ -61,6 +61,9 @@ void _dputchar(char character);
 #define printf printf_
 int printf_(const char* format, ...);
 
+#define printf_c printf_c_
+int printf_c_(int color, const char* format, ...);
+
 #define dprintf dprintf_
 int dprintf_(const char* format, ...);
 

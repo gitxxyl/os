@@ -1,6 +1,7 @@
 #include <cpuid.h>
-#include <include/common.h>
+#include <lib/string.h>
 #include <stdbool.h>
+#include <include/serial.h>
 
 void get_cpuid(){
     int a, b, c, d;

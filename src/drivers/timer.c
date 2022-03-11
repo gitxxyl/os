@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <include/interrupts.h>
 #include <include/timer.h>
+#include <include/port.h>
 
 volatile uint64_t ticks = 0;
 void on_tick_handler();

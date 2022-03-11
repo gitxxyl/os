@@ -4,79 +4,75 @@
  * functions - alloc_pages(), free_pages()
  **/
 
-#include <stivale2.h>
+#include <thirdparty/stivale2.h>
 #include <stddef.h>
-#include <include/common.h>
 #include <include/bitmap.h>
+#include <lib/printf.h>
+#include <lib/memory.h>
+#include <lib/assert.h>
+#include <lib/string.h>
+#include <include/stivale_tag.h>
 
-static uint64_t detected_memory = 0;
+static uint64_t available_memory = 0;
+static uint64_t total_memory = 0;
 bitmap_t bmp; 
+static char* get_memory_type_string(int i);
 
 void pmm_init(struct stivale2_struct* stivale2_struct){
+    
+    // ---INIT MEMMAP---
     struct stivale2_struct_tag_memmap* mmap_tag;
-    mmap_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MEMMAP_ID);
+    mmap_tag = (struct stivale2_struct_tag_memmap*) stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     if(mmap_tag == NULL){
-        fb_print("memory map not found");
+        printf("memory map not found");
         return;
     }
     for(uint64_t i = 0; i < mmap_tag->entries; i++){
-        fb_print("[0x");
-        fb_print(itoa(mmap_tag->memmap[i].base, 16));
-        fb_print(" - 0x");
-        fb_print(itoa(mmap_tag->memmap[i].base + mmap_tag->memmap[i].length, 16));
-        fb_print("]: size 0x");
-        fb_print(itoa(mmap_tag->memmap[i].length, 16));
-        fb_print(", type ");
-        // fb_print(itoa(mmap_tag->memmap[i].type, 16));
-        switch(mmap_tag->memmap[i].type){
-            case 1:
-                fb_print("USABLE");
-                break;
-            case 2:
-                fb_print("RESERVED");
-                break;
-            case 3:
-                fb_print("ACPI_RECLAIMABLE");
-                break;
-            case 4:
-                fb_print("ACPI_NVS");
-                break;
-            case 5:
-                fb_print("BAD_MEMORY");
-                break;
-            case 0x1000:
-                fb_print("BOOTLOADER_RECLAIMABLE");
-                break;
-            case 0x1001:
-                fb_print("KERNEL_AND_MODULES");
-                break;                
-            case 0x1002:
-                fb_print("FRAMEBUFFER");
-                break;
-        }
-        fb_print("\n");
-        detected_memory += mmap_tag->memmap[i].length;
+        printf("[0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
+            mmap_tag->memmap[i].base, 
+            mmap_tag->memmap[i].base + mmap_tag->memmap[i].length, 
+            mmap_tag->memmap[i].length, 
+            get_memory_type_string(mmap_tag->memmap[i].type));
+        total_memory += mmap_tag->memmap[i].length;
+        if(mmap_tag->memmap[i].type == 1) available_memory += mmap_tag->memmap[i].length;
     }
-    fb_print("Total: 0x");
-    fb_print(itoa(detected_memory, 16));
-
-    uint64_t cr0;
-    asm("movq %%cr0, %0": "=r"(cr0));
-    fb_print("\ncr0 set bits: ");
-    fb_print_bits(cr0);
-
-    uint64_t cr4;
-    asm("movq %%cr4, %0": "=r"(cr4));
-    fb_print("\ncr4 set bits: ");
-    fb_print_bits(cr4);
-
-    uint64_t bits = detected_memory / 0x1000;
-    uint64_t bitmap_byte_size = bits / 8;
-    bmp.size = bitmap_byte_size;
-
-    fb_print("\nbitmap size: ");
-    fb_print(itoa(bitmap_byte_size, 10));
+    printf("Total memory: 0x%08x\n", total_memory);
+    printf("Available memory: 0x%08x\n", available_memory);
+    
+    // ---INIT BITMAP---
+    // 1 bit per page (4096b), 8 bits per byte
+    bmp.size = (available_memory / 0x1000) / 8;
+    for(uint64_t i = 0; i < mmap_tag->entries; i++){
+        if(mmap_tag->memmap[i].type == 1 && mmap_tag->memmap[i].length > bmp.size){
+            bmp.map = (uint8_t*) mmap_tag->memmap[i].base;
+            break;
+        }
+    }
+    memset(bmp.map, 0, bmp.size);
+    printf("Bitmap of size %d bytes initialised at 0x%08x\n", bmp.size, bmp.map);
+    // test bitmap
+    // set_bit(&bmp, 10);
+    assert(get_bit(&bmp, 10) == 1);
 }
 
-
-
+static char* get_memory_type_string(int i){
+    switch(i){
+        case 1:
+            return "USABLE";
+        case 2:
+            return "RESERVED";
+        case 3:
+            return "ACPI_RECLAIMABLE";
+        case 4:
+            return "ACPI_NVS";
+        case 5:
+            return "BAD_MEMORY";
+        case 0x1000:
+            return "BOOTLOADER_RECLAIMABLE";
+        case 0x1001:
+            return "KERNEL_AND_MODULES";             
+        case 0x1002:
+            return "FRAMEBUFFER";
+    }
+    return "INVALID";
+}
