@@ -94,22 +94,25 @@ void _start(struct stivale2_struct *stivale2_struct)
         fb_print("Not present\n");
     }
 
-    printf("Allocating 2+1 pages..");
-    void* p = alloc_pages(2);
+    printf("Allocating 2+1 pages...\n");
+    void* p = alloc_pages(1);
+    printf("Allocated at %p\n", p);
     void* p2 = alloc_pages(1);
-    printf("Allocated %p\n", p2);
+    free_pages(p, 1);
+    printf("Allocated at %p\n", p2);
+    void* p3 = alloc_pages(1);
+    printf("Allocated at %p\n", p3);
+    void* p4 = alloc_pages(1);
+    printf("Allocated at %p\n", p4);
 
-    uint64_t* x = malloc(sizeof(uint64_t));
-    printf("%p\n", x);
-    uint64_t* x2 = malloc(sizeof(uint64_t));
-    printf("%p\n", x2);
-    free(x);
-    uint64_t* x3 = malloc(sizeof(uint64_t));
-    printf("%p\n", x3);
+    uint64_t cr4;
 
-    fb_print_color("\n\n[REDACTED]OS v0.2 booted successfully on Limine v", 0x00FF00);
-    fb_print_color(stivale2_struct->bootloader_version, 0x00FF00);
-    
+    asm volatile("mov %%cr4, %0" : "=rax"(cr4));
+
+    printf("LA57: %b", (cr4 >> 12) & 1);
+
+    printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.2 booted successfully on Limine v%s", stivale2_struct->bootloader_version);
+
     fb_print("\nInterrupts enabled, system ready.\n"); 
     // No more proactive code from here, all initialization must be completed
     asm ("sti");

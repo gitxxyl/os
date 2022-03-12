@@ -5,3 +5,7 @@ log.txt
 iso_root
 limine 
 src/image.iso
+*.o
+*.d
+*.iso 
+*.elf 

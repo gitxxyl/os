@@ -53,11 +53,11 @@ override HEADER_DEPS := $(CFILES:.c=.d)
 .PHONY: all
 all: $(KERNEL)
 	@../iso.sh
-	@qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M
+	@qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M -cpu qemu64,+la57
 	@make clean -s
 gdb: $(KERNEL)
 	@../iso.sh
-	@qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M -s -S &
+	@qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M -s -S -cpu qemu64,+la57
 	@make clean -s
 
 # Link rules for the final kernel executable.

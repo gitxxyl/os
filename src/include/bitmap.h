@@ -10,7 +10,7 @@ typedef struct bitmap{
 
 void set_bit(bitmap_t* bitmap, size_t bit);
 void clear_bit(bitmap_t* bitmap, size_t bit);
-void set_bits(bitmap_t* bitmap, size_t start, size_t end);
-void clear_bits(bitmap_t* bitmap, size_t start, size_t end);
 bool get_bit(bitmap_t* bitmap, size_t bit);
+uint64_t find_first_free(bitmap_t* bitmap);
+
 #endif // BITMAP_H
