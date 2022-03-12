@@ -7,7 +7,7 @@
 #include <thirdparty/stivale2.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include <include/bitmap.h>
+#include <lib/bitmap.h>
 #include <include/memory.h>
 #include <lib/printf.h>
 #include <lib/memory.h>

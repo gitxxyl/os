@@ -4,7 +4,7 @@ log.txt
 .vscode
 iso_root
 limine 
-src/image.iso
+*.iso
 *.o
 *.d
 *.iso 

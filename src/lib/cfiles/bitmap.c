@@ -1,4 +1,4 @@
-#include <include/bitmap.h>
+#include <lib/bitmap.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
