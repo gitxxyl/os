@@ -14,7 +14,7 @@ endif
 AS := x86_64-elf-as
 
 # User controllable CFLAGS.
-CFLAGS ?= -O2 -g -Wall -Wextra -pipe -nostdlib -Wno-unused-parameter -Wno-int-to-pointer-cast
+CFLAGS ?= -O2 -g -Wall -Wextra -pipe -nostdlib -Wno-unused-parameter -Wno-int-to-pointer-cast -gdwarf-2
 
 # User controllable linker flags. We set none by default.
 LDFLAGS ?=
@@ -57,11 +57,8 @@ all: $(KERNEL)
 	@make clean -s
 gdb: $(KERNEL)
 	@../iso.sh
-	@qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M -s -S
+	@qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M -s -S &
 	@make clean -s
-
-stivale2.h:
-	curl https://raw.githubusercontent.com/stivale/stivale/master/stivale2.h -o $@
 
 # Link rules for the final kernel executable.
 $(KERNEL): $(OBJ)

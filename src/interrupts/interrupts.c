@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include <lib/string.h>
+#include <lib/printf.h>
 
 void load_idt();
 void load_isr();
@@ -48,8 +49,9 @@ uint64_t isr_handler(uint64_t rsp){
         }
         else {
             sprint("\nUnhandled interrupt: 0x");
-            sprint(itoa(regs->isr_number, 10));
+            sprint(itoa(regs->isr_number, 16));
             sprint("\n");
+            dprintf("err code: %x", regs->error_code);
             for(;;); // hang because the exception is unhandled
         }
 

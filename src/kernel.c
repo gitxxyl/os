@@ -61,6 +61,8 @@ void* stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
 
 extern void sse_init();
 char* dtoa(float f);
+void *malloc(size_t size);
+void free(void *ptr);
 
 void _start(struct stivale2_struct *stivale2_struct)
 {
@@ -91,6 +93,20 @@ void _start(struct stivale2_struct *stivale2_struct)
     } else {
         fb_print("Not present\n");
     }
+
+    printf("Allocating 2+1 pages..");
+    void* p = alloc_pages(2);
+    void* p2 = alloc_pages(1);
+    printf("Allocated %p\n", p2);
+
+    uint64_t* x = malloc(sizeof(uint64_t));
+    printf("%p\n", x);
+    uint64_t* x2 = malloc(sizeof(uint64_t));
+    printf("%p\n", x2);
+    free(x);
+    uint64_t* x3 = malloc(sizeof(uint64_t));
+    printf("%p\n", x3);
+
     fb_print_color("\n\n[REDACTED]OS v0.2 booted successfully on Limine v", 0x00FF00);
     fb_print_color(stivale2_struct->bootloader_version, 0x00FF00);
     
