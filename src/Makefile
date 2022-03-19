@@ -60,12 +60,9 @@ gdb: $(KERNEL)
 	@qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset -m 512M -s -S -cpu qemu64,+la57
 	@make clean -s
 
-# Link rules for the final kernel executable.
 $(KERNEL): $(OBJ)
 	@$(LD) -r -b binary -o sfn_fonts/font_unifont.o sfn_fonts/unifont.sfn
 	@$(LD) sfn_fonts/font_unifont.o $(OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@
-
-# Compilation rules for *.c files.
 
 %.o: %.asm 
 	@nasm -felf64 $< -o $@

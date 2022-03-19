@@ -61,8 +61,6 @@ void* stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
 
 extern void sse_init();
 char* dtoa(float f);
-void *malloc(size_t size);
-void free(void *ptr);
 
 void _start(struct stivale2_struct *stivale2_struct)
 {
@@ -105,11 +103,12 @@ void _start(struct stivale2_struct *stivale2_struct)
     void* p4 = alloc_pages(1);
     printf("Allocated at %p\n", p4);
 
-    uint64_t cr4;
+    vmm_init();
+    printf("Virtual memory initialised.\n");
 
-    asm volatile("mov %%cr4, %0" : "=rax"(cr4));
-
-    printf("LA57: %b", (cr4 >> 12) & 1);
+    //Force page fault: err code 0x0 (not-present, read access, system)
+    uint64_t* a = 0xFFFFFFFFFFFFFFFF;
+    printf("%x", *a);
 
     printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.2 booted successfully on Limine v%s", stivale2_struct->bootloader_version);
 

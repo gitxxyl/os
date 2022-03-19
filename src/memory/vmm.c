@@ -8,15 +8,19 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#include <lib/printf.h>
+
 #include <include/memory.h>
 #include <include/paging.h>
 
-void paging_init(){
+static pml5_entry_t* PML5;
+
+void vmm_init(){
     
 }
 
-void change_page_directory(page_directory_t* new_page_directory){
-    asm volatile("mov %0, %%cr3" : : "r"((uintptr_t) new_page_directory));
+void activate_pml5(pml5_entry_t* pml5){
+    asm volatile("mov %0, %%cr3" : : "r"(pml5));
 }
 
 static inline bool isL5(void) {
