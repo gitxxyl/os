@@ -18,14 +18,14 @@
 
 static uint8_t stack[8192];
 
-static struct stivale2_tag paging_hdr_tag = {
-    .identifier = STIVALE2_HEADER_TAG_5LV_PAGING_ID,
-    .next = 0
-};
+// static struct stivale2_tag paging_hdr_tag = {
+//     .identifier = STIVALE2_HEADER_TAG_5LV_PAGING_ID,
+//     .next = 0
+// };
 static struct stivale2_header_tag_terminal terminal_hdr_tag = {
     .tag = {
         .identifier = STIVALE2_HEADER_TAG_TERMINAL_ID,
-        .next = (uint64_t)&paging_hdr_tag},
+        .next = 0},
     .flags = 0};
 
 static struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
@@ -69,6 +69,8 @@ void _start(struct stivale2_struct *stivale2_struct)
     graphics_init(stivale2_struct, 0xFF000000, 0xFFFFFFFF);
     fb_print("Framebuffer initialised.\n");
     fb_print("Serial port initialised.\n");
+    
+
     interrupts_init();
     fb_print("Interrupts initialised.\n");
     keyboard_init();
@@ -82,33 +84,21 @@ void _start(struct stivale2_struct *stivale2_struct)
 
     fb_print("\nMemory map information:\n");
     pmm_init(stivale2_struct);
+    //vmm_init(stivale2_struct); 
 
-    get_cpuid();
-    fb_print("\nSSE: ");
-    if(check_sse()){
-        fb_print("Present\n");
-        sse_init();
-    } else {
-        fb_print("Not present\n");
-    }
-
-    printf("Allocating 2+1 pages...\n");
-    void* p = alloc_pages(1);
-    printf("Allocated at %p\n", p);
-    void* p2 = alloc_pages(1);
-    free_pages(p, 1);
-    printf("Allocated at %p\n", p2);
-    void* p3 = alloc_pages(1);
-    printf("Allocated at %p\n", p3);
-    void* p4 = alloc_pages(1);
-    printf("Allocated at %p\n", p4);
-
-    vmm_init();
-    printf("Virtual memory initialised.\n");
+    //get_cpuid();
+    // fb_print("\nSSE: ");
+    // if(check_sse()){
+    //     fb_print("Present\n");
+    //     sse_init();
+    // } else {
+    //     fb_print("Not present\n");
+    // }
+    
 
     //Force page fault: err code 0x0 (not-present, read access, system)
-    uint64_t* a = 0xFFFFFFFFFFFFFFFF;
-    printf("%x", *a);
+    // uint64_t* a = 0xFFFFFFFFFFFFFF00;
+    // printf("%x", *a);
 
     printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.2 booted successfully on Limine v%s", stivale2_struct->bootloader_version);
 

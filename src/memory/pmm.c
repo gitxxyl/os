@@ -22,22 +22,12 @@ static uint64_t used_pages = 0;
 bitmap_t bmp; 
 
 static char* get_memory_type_string(int i);
-static inline bool isL5(void);
-
-// uint64_t high_to_phys_data(uint64_t vaddr){ if(isL5()) {return vaddr - L5HIGHER_HALF_DATA_OFFSET;} return vaddr - L4HIGHER_HALF_DATA_OFFSET; }
-// uint64_t high_to_phys_code(uint64_t vaddr){ return vaddr - HIGHER_HALF_CODE_OFFSET; }
-// uint64_t phys_to_high_data(uint64_t paddr){ if(isL5()) {return paddr + L5HIGHER_HALF_DATA_OFFSET;} return paddr + L4HIGHER_HALF_DATA_OFFSET; }
-// uint64_t phys_to_high_code(uint64_t paddr){ return paddr + HIGHER_HALF_CODE_OFFSET; }
 
 void pmm_init(struct stivale2_struct* stivale2_struct){
-    
-    // INIT MEMMAP
+
     struct stivale2_struct_tag_memmap* mmap_tag;
     mmap_tag = (struct stivale2_struct_tag_memmap*) stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MEMMAP_ID);
-    if(mmap_tag == NULL){
-        printf("memory map not found");
-        return;
-    }
+    assert(mmap_tag != NULL);
     for(uint64_t i = 0; i < mmap_tag->entries; i++){
         struct stivale2_mmap_entry cur = mmap_tag->memmap[i];
         printf("[0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
@@ -51,10 +41,8 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
     }
     printf("Total memory: 0x%08x\n", total_memory);
     printf("Available memory: 0x%08x\n", available_memory);
-    
-    // INIT BITMAP
 
-    bmp.size = (available_memory / PAGE_SIZE) / 8; // 1 bit per page (4096b), 8 bits per byte
+    bmp.size = (available_memory / PAGE_SIZE) / 8;
 
     // place bitmap at the first usable memory address
     for(uint64_t i = 0; i < mmap_tag->entries; i++){
@@ -77,7 +65,7 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
             break;
         }
     }
-    memset(bmp.map, 0xFF, bmp.size);
+    memset(bmp.map, 0xFFFF, bmp.size);
     printf("Bitmap of size %x bytes initialised at 0x%08x\n", bmp.size, bmp.map);
 
     // test bitmap
@@ -85,6 +73,9 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
     assert(get_bit(&bmp, 10) == 0);
     set_bit(&bmp, 10);
     assert(get_bit(&bmp, 10) == 1);
+
+    int a = 1+1;
+    int b = 1+1;
 
     // Make USABLE memory available to be allocated
 
@@ -116,18 +107,22 @@ void lock_region(uint64_t base, uint64_t length){
     }
 }
 
-void* alloc_pages(uint64_t num){
+void* pmm_alloc_pages(uint64_t num){
     for(uint64_t i = 0; i < (highest_page / PAGE_SIZE); i++){
         if(!get_bit(&bmp, i)){
             for(uint64_t n = 0; n < num; n++)
                 set_bit(&bmp, i + n);
+            uint64_t* pages = (uint64_t*) (i * PAGE_SIZE + HH_MEMORY);
+            for(uint64_t i = 0; i < (num / PAGE_SIZE) / sizeof(uint64_t); i++){
+                pages[i] = 0;
+            }
             return (void*)(uint64_t)(i * PAGE_SIZE);
         }
     }
 }
 
 
-void free_pages(uint64_t addr, uint64_t num){
+void pmm_free_pages(uint64_t addr, uint64_t num){
     for(uint64_t i = 0; i < num; i++){
         clear_bit(&bmp, addr / PAGE_SIZE + i);
     } 

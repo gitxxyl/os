@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stddef.h>
 
 void *memcpy(void *dest, const void *src, uint32_t count)
 {
@@ -8,11 +9,14 @@ void *memcpy(void *dest, const void *src, uint32_t count)
     return dest;
 }
 
-void *memset(void *dest, char val, uint32_t count)
+void *memset(void *pointer, uint32_t value, size_t size)
 {
-    char *temp = (char *)dest;
-    for( ; count != 0; count--) *temp++ = val;
-    return dest;
+    uint8_t *buffer_pointer = (uint8_t *)pointer;
+
+    for (size_t i = 0; i < size; i++)
+        *buffer_pointer++ = value;
+
+    return pointer;
 }
 
 uint16_t *memsetw(uint16_t *dest, uint16_t val, uint32_t count)
