@@ -84,7 +84,7 @@ void _start(struct stivale2_struct *stivale2_struct)
 
     fb_print("\nMemory map information:\n");
     pmm_init(stivale2_struct);
-    //vmm_init(stivale2_struct); 
+    vmm_init(stivale2_struct); 
 
     //get_cpuid();
     // fb_print("\nSSE: ");

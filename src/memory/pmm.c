@@ -112,10 +112,7 @@ void* pmm_alloc_pages(uint64_t num){
         if(!get_bit(&bmp, i)){
             for(uint64_t n = 0; n < num; n++)
                 set_bit(&bmp, i + n);
-            uint64_t* pages = (uint64_t*) (i * PAGE_SIZE + HH_MEMORY);
-            for(uint64_t i = 0; i < (num / PAGE_SIZE) / sizeof(uint64_t); i++){
-                pages[i] = 0;
-            }
+            memset((void*)(i * PAGE_SIZE), 0, num * PAGE_SIZE);
             return (void*)(uint64_t)(i * PAGE_SIZE);
         }
     }
