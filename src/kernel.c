@@ -5,6 +5,8 @@
 #include <lib/string.h>
 #include <lib/math.h>
 #include <lib/printf.h>
+#include <lib/alloc.h>
+#include <lib/ordered_array.h>
 
 #include <thirdparty/stivale2.h>
 
@@ -84,25 +86,14 @@ void _start(struct stivale2_struct *stivale2_struct)
 
     fb_print("\nMemory map information:\n");
     pmm_init(stivale2_struct);
-    vmm_init(stivale2_struct); 
 
-    //get_cpuid();
-    // fb_print("\nSSE: ");
-    // if(check_sse()){
-    //     fb_print("Present\n");
-    //     sse_init();
-    // } else {
-    //     fb_print("Not present\n");
-    // }
-    
-
-    //Force page fault: err code 0x0 (not-present, read access, system)
-    // uint64_t* a = 0xFFFFFFFFFFFFFF00;
-    // printf("%x", *a);
+    heap_init();
+    fb_print("Heap initialised.\n");
 
     printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.2 booted successfully on Limine v%s", stivale2_struct->bootloader_version);
 
     fb_print("\nInterrupts enabled, system ready.\n"); 
+
     // No more proactive code from here, all initialization must be completed
     asm ("sti");
     

@@ -8,5 +8,6 @@ void pmm_init();
 void interrupts_init();
 void keyboard_init();
 void vmm_init();
+void heap_init();
 
 #endif // INIT_H

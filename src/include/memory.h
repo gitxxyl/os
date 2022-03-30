@@ -5,8 +5,8 @@
 
 #define PAGE_SIZE 0x1000
 
-#define HH_KERNEL   0xFFFFFFFF80000000UL
-#define HH_MEMORY   0xFFFF800000000000UL
+#define HH_KERNEL   0xffffffff80000000
+#define HH_MEMORY   0xffff800000000000
 
 // PMM 
 // FIXME: should probably separate into multiple .h files
