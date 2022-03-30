@@ -6,7 +6,7 @@
 
 /**
  * Serial port communication driver for debugging.
- * Qemu prints serial port output in the terminal - sprint() and sputch() to print to terminal.
+ * Qemu prints serial port output in the terminal - dprint() and sputch() to print to terminal.
  **/
 
 uint32_t serial_init(){

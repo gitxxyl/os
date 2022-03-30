@@ -6,6 +6,7 @@
 #include <lib/math.h>
 #include <lib/printf.h>
 #include <lib/alloc.h>
+#include <lib/assert.h>
 #include <lib/ordered_array.h>
 
 #include <thirdparty/stivale2.h>
@@ -14,8 +15,9 @@
 #include <include/cpuid.h>
 #include <include/graphics.h>
 #include <include/timer.h>
-#include <include/serial.h>
 #include <include/init.h>
+#include <include/vfs.h>
+#include <include/initrd.h>
 
 
 static uint8_t stack[8192];
@@ -63,11 +65,12 @@ void* stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
 
 extern void sse_init();
 char* dtoa(float f);
+dirent_t* initrd_readdir(fs_node_t* node, uint32_t index);
 
 void _start(struct stivale2_struct *stivale2_struct)
 {
     serial_init();
-    sprint("\n\n");
+    dprint("\n\n");
     graphics_init(stivale2_struct, 0xFF000000, 0xFFFFFFFF);
     fb_print("Framebuffer initialised.\n");
     fb_print("Serial port initialised.\n");
@@ -80,15 +83,22 @@ void _start(struct stivale2_struct *stivale2_struct)
     timer_init(1000);
     fb_print("Timer initialised.\n");
     
-    sprint("\n\n[REDACTED]OS v0.2 booted successfully on Limine v");
-    sprint(stivale2_struct->bootloader_version);
-    sprint("\n");
+    dprintf("\n\n[REDACTED]OS v0.2 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
 
     fb_print("\nMemory map information:\n");
     pmm_init(stivale2_struct);
 
     heap_init();
     fb_print("Heap initialised.\n");
+
+    struct stivale2_struct_tag_modules *modules_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MODULES_ID);
+    assert(modules_tag != NULL);
+    assert(modules_tag->module_count > 0);
+    uint32_t* initrd_addr = modules_tag->modules[0].begin;
+    dprintf("module %s, %x\n", modules_tag->modules[0].string, *initrd_addr);
+    root = initrd_init(initrd_addr);
+    dprintf("Initrd initialised.\n");
+
 
     printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.2 booted successfully on Limine v%s", stivale2_struct->bootloader_version);
 

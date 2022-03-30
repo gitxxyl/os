@@ -34,6 +34,5 @@ void timer_wait(uint32_t waitticks){
 }
 
 void on_tick_handler(registers_t r){
-    // sprint("\nTick!");
     ticks++;
 }

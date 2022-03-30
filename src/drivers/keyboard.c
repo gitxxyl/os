@@ -86,7 +86,6 @@ uint8_t alt = 0;
 uint8_t capslock = 0;
 
 void keyboard_handler(registers_t* r){
-    //sprint("\n\nyo");
     unsigned char scancode;
     scancode = inb(0x60);
     if (scancode == 0xE0){

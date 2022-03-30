@@ -90,6 +90,7 @@ void* alloc(uint64_t size, bool page_align, heap_t* heap){
         dprintf("heap size: %d\n", heap->index.size);
         for(int j = 0; j < heap->index.size; j++){
             dprintf("[heap] %p, size = %llx\n", lookup_ordered_array(j, &heap->index), ((header_t*)lookup_ordered_array(j, &heap->index))->size);
+            dprintf("requested size = %llx\n", realsize);
         }
         assert(false);
     }
@@ -126,7 +127,7 @@ void* alloc(uint64_t size, bool page_align, heap_t* heap){
         insert_ordered_array((void*)hole_header, &heap->index);
     }
 
-    // dprintf("ALLOCATED %p, %llx\n", block_header, block_header->size);
+    dprintf("ALLOCATED %p, %llx\n", block_header, block_header->size);
     return (void*) ((uint64_t) block_header + sizeof(header_t));
 }
 

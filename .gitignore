@@ -8,4 +8,5 @@ limine
 *.o
 *.d
 *.iso 
+*.img
 *.elf 

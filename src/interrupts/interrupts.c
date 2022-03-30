@@ -1,5 +1,5 @@
 #include <include/interrupts.h>
-#include <include/serial.h>
+
 #include <include/port.h>
 #include <stdint.h>
 
@@ -48,10 +48,7 @@ uint64_t isr_handler(uint64_t rsp){
 
         }
         else {
-            sprint("\nUnhandled interrupt: 0x");
-            sprint(itoa(regs->isr_number, 16));
-            sprint("\n");
-            dprintf("err code: %x", regs->error_code);
+            dprintf("\nUnhandled interrupt: 0x%x with err code %x\n", regs->isr_number, regs->error_code);
             for(;;); // hang because the exception is unhandled
         }
 
@@ -75,7 +72,6 @@ void load_idt(){
 }
 
 void isr_install_handler(uint32_t num, handler_t handler){
-    sprint("\nhandler installed\n");
     isr_handlers[num] = handler;
 }
 void remap_pic(){

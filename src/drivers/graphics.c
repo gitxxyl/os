@@ -11,8 +11,8 @@
 #include <stddef.h>
 #include <include/framebuffer.h>
 #include <include/stivale_tag.h>
+#include <lib/printf.h>
 #include <lib/string.h> 
-#include <include/serial.h>
 #include <thirdparty/ssfn.h>
 
 #define CHARACTER_WIDTH 8
@@ -32,8 +32,7 @@ void graphics_init(struct stivale2_struct *stivale2_struct, uint32_t bgcolor, ui
             asm ("hlt");
         }
     }
-    sprint("Framebuffer found at 0x");
-    sprint(itoa(framebuffer_tag->framebuffer_addr, 16));
+    dprintf("Framebuffer found at 0x%x\n", framebuffer_tag->framebuffer_addr);
 
     fb.addr = framebuffer_tag->framebuffer_addr;
     fb.width = framebuffer_tag->framebuffer_width;

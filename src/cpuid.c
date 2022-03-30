@@ -1,23 +1,14 @@
 #include <cpuid.h>
 #include <lib/string.h>
+#include <lib/printf.h>
 #include <stdbool.h>
-#include <include/serial.h>
+
 
 void get_cpuid(){
     int a, b, c, d;
     for(int i = 0; i < 5; i++){
-        sprint("[CPUID] ");
-        sprint(itoa(i, 10));
-        sprint(": ");
         __cpuid(i, a, b, c, d);
-        sprint(itoa(a, 2));
-        sprint(" ");
-        sprint(itoa(b, 2));
-        sprint(" ");
-        sprint(itoa(c, 2));
-        sprint(" ");
-        sprint(itoa(d, 2));
-        sprint("\n");
+        dprintf("%x %x %x %x\n", a, b, c, d);
     }
 }
 bool check_sse(){
