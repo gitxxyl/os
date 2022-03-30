@@ -65,7 +65,6 @@ void* stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
 
 extern void sse_init();
 char* dtoa(float f);
-dirent_t* initrd_readdir(fs_node_t* node, uint32_t index);
 
 void _start(struct stivale2_struct *stivale2_struct)
 {
@@ -83,8 +82,6 @@ void _start(struct stivale2_struct *stivale2_struct)
     timer_init(1000);
     fb_print("Timer initialised.\n");
     
-    dprintf("\n\n[REDACTED]OS v0.2 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
-
     fb_print("\nMemory map information:\n");
     pmm_init(stivale2_struct);
 
@@ -100,7 +97,8 @@ void _start(struct stivale2_struct *stivale2_struct)
     dprintf("Initrd initialised.\n");
 
 
-    printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.2 booted successfully on Limine v%s", stivale2_struct->bootloader_version);
+    printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s", stivale2_struct->bootloader_version);
+    dprintf("\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
 
     fb_print("\nInterrupts enabled, system ready.\n"); 
 
