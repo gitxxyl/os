@@ -5,10 +5,10 @@ _It lacks proper documentation and a proper license, but for now, just don't cop
 [redacted]os is a hobbyist OS on x86_64. Feel free to contribute (although I'm really bad at git, and I'm not exactly sure why you would want to).
 
 What I'm working on right now:
-* Memory management
+* Filesystem
 
 What I'm going to work on soon:
-* Filesystem
+* Processes / multithreaded context
  
 The current goal is to get DOOM running on this OS. Beyond that, I'm not really sure right now. 
 I might not commit to this repo that often, but I'll try. 
