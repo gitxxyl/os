@@ -1,5 +1,5 @@
-#ifndef BITMAP_H
-#define BITMAP_H
+#pragma once 
+
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -12,5 +12,3 @@ void set_bit(bitmap_t* bitmap, size_t bit);
 void clear_bit(bitmap_t* bitmap, size_t bit);
 bool get_bit(bitmap_t* bitmap, size_t bit);
 uint64_t find_first_free(bitmap_t* bitmap);
-
-#endif // BITMAP_H

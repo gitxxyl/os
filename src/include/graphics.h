@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_H
-#define GRAPHICS_H
+#pragma once 
+
 #include <stdint.h>
 
 void fb_printchar(char);
@@ -9,5 +9,3 @@ void fb_print_bits(uint64_t num);
 void fb_changefg(uint32_t color);
 void fb_changebg(uint32_t color);
 uint32_t fb_getfg();
-
-#endif // GRAPHICS_H

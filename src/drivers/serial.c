@@ -35,7 +35,7 @@ void sputch(char a){
 void _dputchar(char character){
     sputch(character);
 }
-void sprint(char* text){
+void dprint(char* text){
     for (uint32_t i = 0; i < strlen(text); i++)
     {
         sputch(text[i]);

@@ -1,5 +1,4 @@
-#ifndef MEMORY_H
-#define MEMORY_H
+#pragma once 
 #include <stdint.h>
 #include <thirdparty/stivale2.h>
 
@@ -15,5 +14,3 @@ void* pmm_alloc_pages(uint64_t);
 void pmm_free_pages(uint64_t, uint64_t);
 
 // VMM
-
-#endif // MEMORY_H

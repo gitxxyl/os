@@ -1,5 +1,4 @@
-#ifndef PAGING_H
-#define PAGING_H
+#pragma once 
 
 typedef struct pml5_entry {
     // PML4 Table
@@ -86,5 +85,3 @@ typedef struct page_table_entry {
     uint64_t pke:       4;
     uint64_t no_execute:1;
 } pt_entry_t;
-
-#endif // PAGING_H

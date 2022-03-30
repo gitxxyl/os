@@ -1,5 +1,5 @@
-#ifndef INTERRUPTS_H
-#define INTERRUPTS_H
+#pragma once 
+
 #include <stdint.h>
 
 #define LIMINE_CS 0x28
@@ -309,5 +309,3 @@ extern void isr47();
 // extern void isr253();
 // extern void isr254();
 // extern void isr255();
-
-#endif // INTERRUPTS_H

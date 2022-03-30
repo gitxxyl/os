@@ -1,5 +1,5 @@
-#ifndef FRAMEBUFFER_H
-#define FRAMEBUFFER_H
+#pragma once
+
 #include <stdint.h>
 struct fb_struct{
     uint64_t addr;
@@ -8,4 +8,3 @@ struct fb_struct{
     uint16_t bpp;
     uint16_t pitch;
 };
-#endif // FRAMEBUFFER_H

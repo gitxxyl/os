@@ -1,5 +1,4 @@
-#ifndef LIB_MEMORY_H
-#define LIB_MEMORY_H
+#pragma once 
 
 #include <stdint.h>
 #include <stddef.h>
@@ -10,5 +9,3 @@ void *memset(void *s, int c, size_t n);
 void *memset64(void *s, uint64_t c, size_t n);
 void *memmove(void *dest, const void *src, size_t n);
 int memcmp(const void *s1, const void *s2, size_t n);
-
-#endif // MEMORY_H
