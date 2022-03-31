@@ -54,6 +54,7 @@ uint64_t contract(uint64_t size, heap_t* heap){
 }
 heap_t* create_heap(uint64_t start, uint64_t end, uint64_t max, bool us, bool rw){
     heap_t* heap = (heap_t*) kmalloc(sizeof(heap_t));
+    dprintf("start = %p, end = %p, max = %p\n", start, end, max);
 
     assert(heap != 0);
     assert(start % PAGE_SIZE == 0);
@@ -200,5 +201,9 @@ void free(void* ptr, heap_t* heap){
 }
 
 void heap_init(){
-    kheap = create_heap(KHEAP_START, KHEAP_START + (sizeof(void*) + 1) * KHEAP_INITIAL_SIZE, KHEAP_START + (sizeof(void*) + 1) * KHEAP_INITIAL_SIZE, true, true);
+    kheap = create_heap(KHEAP_START, 
+                        KHEAP_START + (sizeof(void*) * HEAP_INDEX_SIZE) + KHEAP_INITIAL_SIZE, 
+                        KHEAP_START + (sizeof(void*) * HEAP_INDEX_SIZE) + KHEAP_INITIAL_SIZE, 
+                        true, 
+                        true);
 }

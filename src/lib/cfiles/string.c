@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
+#include <lib/alloc.h>
 #include <lib/memory.h>
 
 uint32_t strlen(const char* str){
@@ -79,4 +80,52 @@ char* itoa(uint64_t num, uint64_t base) {
   } while (num != 0);
 
   return str;
+}
+
+char* strtok(char* s, char* delm){
+    static int currIndex = 0;
+    if(!s || !delm || s[currIndex] == '\0')
+    return NULL;
+    char *W = (char *)kmalloc(sizeof(char)*100);
+    int i = currIndex, k = 0, j = 0;
+
+    while (s[i] != '\0'){
+        j = 0;
+        while (delm[j] != '\0'){
+            if (s[i] != delm[j])
+                W[k] = s[i];
+            else goto It;
+            j++;
+        }
+
+        i++;
+        k++;
+    }
+It:
+    W[i] = 0;
+    currIndex = i+1;
+    //Iterator = ++ptr;
+    return W;
+}
+char **split(char *string, const char delimiter) {
+    int length = 0, count = 0, i = 0, j = 0;
+    while(*(string++)) {
+        if (*string == delimiter) count++;
+        length++;
+    }
+    string -= (length + 1); // string was incremented one more than length
+    char **array = (char **)kmalloc(sizeof(char *) * (length + 1));
+    char ** base = array;
+    for(i = 0; i < (count + 1); i++) {
+        j = 0;
+        while(string[j] != delimiter) j++;
+        j++;
+        *array = (char *)kmalloc(sizeof(char) * j);
+        memcpy(*array, string, (j-1));
+        (*array)[j-1] = '\0';
+        string += j;
+        array++;
+    }
+    *array = '\0';
+    return base;  
 }

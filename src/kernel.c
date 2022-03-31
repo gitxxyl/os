@@ -17,10 +17,12 @@
 #include <include/timer.h>
 #include <include/init.h>
 #include <include/vfs.h>
+#include <include/targa.h>
 #include <include/initrd.h>
 
 
 static uint8_t stack[8192];
+char* wpaper;
 
 // static struct stivale2_tag paging_hdr_tag = {
 //     .identifier = STIVALE2_HEADER_TAG_5LV_PAGING_ID,
@@ -96,17 +98,25 @@ void _start(struct stivale2_struct *stivale2_struct)
     root = initrd_init(initrd_addr);
     dprintf("Initrd initialised.\n");
 
+    fs_node_t* tga = finddir_fs(root, "wpaper.tga");
+    assert(tga != NULL);
+    wpaper = kmalloc(tga->length);
+    read_fs(tga, wpaper, tga->length, 0);
+    tga_header_t* tga_header = (tga_header_t*) wpaper;
+    dprintf("h = %d, w = %d\n", tga_header->h, tga_header->w);
 
-    printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s", stivale2_struct->bootloader_version);
+    display_bmp(0, 0, tga_header->h, tga_header->w, wpaper, true);
+    // fb_clear();
+
+
+    printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
+    printf_c(0xFF00FF00, "\nish> ");
     dprintf("\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
 
-    fb_print("\nInterrupts enabled, system ready.\n"); 
-
     // No more proactive code from here, all initialization must be completed
-    asm ("sti");
+    asm("sti");
     
     // asm volatile ("int3"); // breakpoint exception for interrupt debugging
-
     for (;;)
     {
         asm("hlt");

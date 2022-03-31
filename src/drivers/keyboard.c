@@ -130,10 +130,10 @@ void keyboard_handler(registers_t* r){
         default:
           if(shift){
             //key_handler(kbdusshift[scancode], scancode, shift, ctrl, alt);
-            fb_printchar(kbdusshift[scancode]);
+            shell_getchar(kbdusshift[scancode]);
           } else {
             //key_handler(kbdus[scancode], scancode, shift, ctrl, alt);
-            fb_printchar(kbdus[scancode]);
+            shell_getchar(kbdus[scancode]);
           }
           
       }

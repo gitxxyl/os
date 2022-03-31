@@ -11,3 +11,5 @@ char *strcpy(char *dest, const char *src);
 char *strncpy(char *dest, const char *src, size_t n);
 char* itoa(uint64_t num, uint64_t base);
 char* dtoa(float f);
+char* strtok(char* str, char* delim);
+char **split(char *string, const char delimiter);
