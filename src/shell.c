@@ -2,7 +2,10 @@
 #include <lib/string.h>
 #include <lib/printf.h>
 #include <lib/alloc.h>
+#include <include/cmos.h>
 #include <include/timer.h>
+#include <thirdparty/stivale2.h>
+#include <lib/assert.h>
 #include <include/vfs.h>
 #include <include/targa.h>
 char cmd[256];
@@ -79,7 +82,9 @@ void shell_exec(char* cmd){
         display_bmp(0, 0, tga_header->h, tga_header->w, wpaper, true);
     }
     else if (!strcmp(argc, "time")){
-        printf("%d ticks have passed since startup.", get_ticks());
+        uint64_t ticks = get_ticks();
+        printf("%dms, or %ds have passed since startup.\n", ticks, ticks / 1000);
+        printf(rtc_datetime());
     }
     else if (!strcmp(argc, "cat")){
         cat(split(tmp, ' ')[1]);
@@ -109,5 +114,21 @@ void shell_exec(char* cmd){
         }
     }
     kfree(tmp);
-    printf_c(0xFF00FF00, "\nish> ");
+    printf_c(0xFF00FF00, "\nksh> ");
+}
+
+void shell_init(struct stivale2_struct *stivale2_struct){
+    fs_node_t* tga = finddir_fs(root, "wpaper.tga");
+    assert(tga != NULL);
+    wpaper = kmalloc(tga->length);
+    read_fs(tga, wpaper, tga->length, 0);
+    tga_header_t* tga_header = (tga_header_t*) wpaper;
+    dprintf("h = %d, w = %d\n", tga_header->h, tga_header->w);
+
+    display_bmp(0, 0, tga_header->h, tga_header->w, wpaper, true);
+    // fb_clear();
+
+
+    printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
+    printf_c(0xFF00FF00, "\nksh> ");
 }

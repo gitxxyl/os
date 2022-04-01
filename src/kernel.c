@@ -98,19 +98,7 @@ void _start(struct stivale2_struct *stivale2_struct)
     root = initrd_init(initrd_addr);
     dprintf("Initrd initialised.\n");
 
-    fs_node_t* tga = finddir_fs(root, "wpaper.tga");
-    assert(tga != NULL);
-    wpaper = kmalloc(tga->length);
-    read_fs(tga, wpaper, tga->length, 0);
-    tga_header_t* tga_header = (tga_header_t*) wpaper;
-    dprintf("h = %d, w = %d\n", tga_header->h, tga_header->w);
-
-    display_bmp(0, 0, tga_header->h, tga_header->w, wpaper, true);
-    // fb_clear();
-
-
-    printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
-    printf_c(0xFF00FF00, "\nish> ");
+    shell_init(stivale2_struct);
     dprintf("\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
 
     // No more proactive code from here, all initialization must be completed

@@ -59,7 +59,7 @@ uint64_t vmm_virtual_to_phys(uint64_t* map, uint64_t vaddr){
 
 void load_pml4(uint64_t cpml4){
     asm volatile("mov %0, %%cr3" :: "r"(cpml4));
-    for(;;);
+    //for(;;);
 }
 
 void invlpg(uint64_t addr){
@@ -80,7 +80,7 @@ void vmm_init(){
     //     vmm_map_page(pml4, i, i, 0b11);
     // }
 
-    for (uint64_t i = 0; i < 0x80000000; i += PAGE_SIZE){
+    for (uint64_t i = 0; i < 0x1d8000; i += PAGE_SIZE){
         vmm_map_page(pml4, i, (uint64_t) i + HH_KERNEL, 0b11);
     }
     

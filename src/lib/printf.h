@@ -75,6 +75,7 @@ int dprintf_(const char* format, ...);
  * \param format A string that specifies the format of the output
  * \return The number of characters that are WRITTEN into the buffer, not counting the terminating null character
  */
+#define sprintf sprintf_
 int sprintf_(char* buffer, const char* format, ...);
 
 
