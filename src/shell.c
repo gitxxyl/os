@@ -78,9 +78,6 @@ void shell_exec(char* cmd){
             printf("%s", tmp + strlen(argc) + 1);
         }
     }
-    else if (!strcmp(argc, "vmm")){
-        vmm_init();
-    }
     else if (!strcmp(argc, "clear")){
         // fb_changebg(0x00);
         tga_header_t* tga_header = (tga_header_t*) wpaper;
