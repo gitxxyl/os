@@ -14,6 +14,7 @@
 #include <include/memory.h>
 #include <include/cpuid.h>
 #include <include/graphics.h>
+#include <include/stivale_tag.h>
 #include <include/timer.h>
 #include <include/init.h>
 #include <include/vfs.h>
@@ -86,10 +87,9 @@ void _start(struct stivale2_struct *stivale2_struct)
     
     fb_print("\nMemory map information:\n");
     pmm_init(stivale2_struct);
-
+    vmm_init(stivale2_struct);
     heap_init();
     fb_print("Heap initialised.\n");
-
     struct stivale2_struct_tag_modules *modules_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MODULES_ID);
     assert(modules_tag != NULL);
     assert(modules_tag->module_count > 0);

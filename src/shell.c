@@ -7,6 +7,7 @@
 #include <thirdparty/stivale2.h>
 #include <lib/assert.h>
 #include <include/vfs.h>
+#include <include/init.h>
 #include <include/targa.h>
 char cmd[256];
 
@@ -72,8 +73,13 @@ void shell_exec(char* cmd){
     char* argc = split(tmp, ' ')[0];
     printf("\n");
     dprintf("arg: %s\n", argc);
-    if(!strcmp(argc, "test")){
-        printf("test");
+    if(!strcmp(argc, "echo")){
+        if(strlen(tmp) > strlen(argc) + 1){
+            printf("%s", tmp + strlen(argc) + 1);
+        }
+    }
+    else if (!strcmp(argc, "vmm")){
+        vmm_init();
     }
     else if (!strcmp(argc, "clear")){
         // fb_changebg(0x00);
@@ -83,8 +89,8 @@ void shell_exec(char* cmd){
     }
     else if (!strcmp(argc, "time")){
         uint64_t ticks = get_ticks();
-        printf("%dms, or %ds have passed since startup.\n", ticks, ticks / 1000);
-        printf(rtc_datetime());
+        printf("Current date and time: %s\n", rtc_datetime());
+        printf("%dms, or %d.%ds have passed since startup.", ticks, ticks / 1000, (ticks / 10) % 100);
     }
     else if (!strcmp(argc, "cat")){
         cat(split(tmp, ' ')[1]);
@@ -92,25 +98,40 @@ void shell_exec(char* cmd){
     else if (!strcmp(argc, "tga")){
         tga(split(tmp, ' ')[1]);
     }
+    else if (!strcmp(argc, "ls")){
+        fs_node_t* node = root;
+        uint64_t i = 0;
+        while(node != 0){
+            if(node->flags & 0x7 == FS_DIRECTORY){
+                printf("/%s ", node->name);
+            }
+            else{
+                printf("%s ", node->name);
+            }
+            node = readdir_fs(root, i++);
+        }
+    }
     else if (!strcmp(argc, "help")){
         printf("Commands:\n");
         printf("    clear\n");
         printf("    time\n");
+        printf("    echo\n");
+        printf("    ls\n");
         printf("    cat <filename>\n");
-        printf("    test\n");
+        printf("    tga <filename>\n");
         printf("    help");
     }
     else{
         fs_node_t* node = finddir_fs(root, argc);
         if(node == 0){
-            printf("%s: File or command not found\n", argc);
+            printf("%s: File or command not found", argc);
         }
         else if(node->flags & 0x7 == FS_DIRECTORY){
-            printf("%s: is a directory\n", argc);
+            printf("%s: is a directory", argc);
             return;
         }
         else {
-            printf("%s: is a file\n", argc);
+            printf("%s: is a file", argc);
         }
     }
     kfree(tmp);
@@ -130,5 +151,6 @@ void shell_init(struct stivale2_struct *stivale2_struct){
 
 
     printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
+    printf_c(0xFF00FF00, "Type help for a list of commands.\n");
     printf_c(0xFF00FF00, "\nksh> ");
 }

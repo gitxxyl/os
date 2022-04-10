@@ -18,10 +18,13 @@
 #include <stivale2.h>
 
 uint64_t* pml4 = 0;
+uint64_t pagetables_end;
 
 uint64_t* vmm_get_pagetable(uint64_t* base, uint16_t offset, uint64_t flags){
     if(!(base[offset] & 0x1)){ // page not present
-        base[offset] = ((uint64_t)pmm_alloc_pages(1));
+        uint64_t addr = ((uint64_t)pmm_alloc_pages(1));
+        if(addr > pagetables_end) pagetables_end = addr;
+        base[offset] = addr;
         base[offset] |= flags;
     }
     return (uint64_t*)(base[offset] & ~0xFFF); 
@@ -71,23 +74,32 @@ void invlpg(uint64_t addr){
     }
 }
 
-void vmm_init(){
+void vmm_init(struct stivale2_struct* stivale2_struct){
+    struct stivale2_struct_tag_kernel_base_address* kernel_base_address = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_KERNEL_BASE_ADDRESS_ID);
+    assert(kernel_base_address != NULL);
+    uint64_t kernel_base_phys = kernel_base_address->physical_base_address;
+    uint64_t kernel_base_virt = kernel_base_address->virtual_base_address;
+
+
     pml4 = (uint64_t*)pmm_alloc_pages(1);
-    //dprintf("pml4: %p\n", pml4);
+    dprintf("pml4: %p\n", pml4);
+    dprintf("kernel_base_phys: %llx\n", kernel_base_phys);
+    dprintf("kernel_base_virt: %llx\n", kernel_base_virt);
 
     // // identity map the first 4gb
     // for (uint64_t i = 0; i < 0x100000000; i += PAGE_SIZE){
     //     vmm_map_page(pml4, i, i, 0b11);
     // }
 
-    for (uint64_t i = 0; i < 0x1d8000; i += PAGE_SIZE){
-        vmm_map_page(pml4, i, (uint64_t) i + HH_KERNEL, 0b11);
+    for (uint64_t i = 0; i < 0x200000; i += PAGE_SIZE){
+        vmm_map_page(pml4, (uint64_t) i + kernel_base_phys, (uint64_t) i + kernel_base_virt, 0b11);
     }
     
     for (uint64_t i = 0; i < 0x100000000; i += PAGE_SIZE){
         vmm_map_page(pml4, i, (uint64_t) i, 0b11);
         vmm_map_page(pml4, i, (uint64_t) i + HH_MEMORY, 0b11);
     }
+    dprintf("pagetables_end = %p\n", pagetables_end);
 
     // for (uint64_t i = 0x2000000; i < 0x100000000; i += PAGE_SIZE){
     //     vmm_map_page(pml4, i, i, 0b11);
@@ -100,3 +112,4 @@ void vmm_init(){
     // }
     load_pml4((uint64_t)pml4);
 }
+

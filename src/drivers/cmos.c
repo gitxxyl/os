@@ -29,6 +29,6 @@ char* rtc_datetime(){
         hour = ((hour & 0x7F) + 12) % 24;
     } 
     
-    sprintf(ret, "%d/%d/20%d %d:%d:%d", day, month, year, hour, min, s);
+    sprintf(ret, "%d/%d/20%d %d:%d:%02d", day, month, year, hour, min, s);
     return ret; 
 }

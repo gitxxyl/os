@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <lib/ordered_array.h>
 
-#define KHEAP_START         0xffff800000100000
+#define KHEAP_START         0xffff800001100000
 #define KHEAP_INITIAL_SIZE  0x6400000
 #define HEAP_INDEX_SIZE     0x20000
 #define HEAP_MAGIC          0xBAAAAAAD

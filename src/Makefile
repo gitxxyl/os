@@ -19,6 +19,8 @@ CFLAGS ?= -O2 -g -Wall -Wextra -pipe -nostdlib -Wno-unused-parameter -Wno-int-to
 # User controllable linker flags. We set none by default.
 LDFLAGS ?=
 
+QEMUFLAGS ?= --serial stdio -D ../log.txt -d cpu_reset,int -m 512M -cpu qemu64 --no-reboot --no-shutdown -rtc base=localtime -M smm=off
+
 # Internal C flags that should not be changed by the user.
 override INTERNALCFLAGS :=   \
 	-I.                  \
@@ -53,11 +55,11 @@ override HEADER_DEPS := $(CFILES:.c=.d)
 .PHONY: all
 all: $(KERNEL)
 	@../iso.sh
-	@qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset,int,page -m 512M -cpu qemu64 --no-reboot --no-shutdown -rtc base=localtime
+	@qemu-system-x86_64 image.iso $(QEMUFLAGS)
 	@make clean -s
 gdb: $(KERNEL)
 	@../iso.sh
-	@qemu-system-x86_64 image.iso -serial stdio -D ../log.txt -d cpu_reset,int -m 512M -s -S -cpu qemu64 --no-reboot --no-shutdown 
+	@qemu-system-x86_64 image.iso $(QEMUFLAGS) -s -S
 	@make clean -s
 
 $(KERNEL): $(OBJ)

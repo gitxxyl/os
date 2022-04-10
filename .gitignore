@@ -10,3 +10,4 @@ limine
 *.iso 
 *.img
 *.elf 
+make_initrd
