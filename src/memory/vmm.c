@@ -17,7 +17,7 @@
 
 #include <stivale2.h>
 
-uint64_t* pml4 = 0;
+uint64_t* k_pml4 = 0;
 uint64_t pagetables_end;
 
 uint64_t* vmm_get_pagetable(uint64_t* base, uint16_t offset, uint64_t flags){
@@ -68,8 +68,7 @@ void load_pml4(uint64_t cpml4){
 void invlpg(uint64_t addr){
     uint64_t cr3;
     asm volatile("mov %%cr3, %0" : "=r"(cr3));
-    if((cr3 & ~((uint64_t) 0xfff)) == ((uint64_t)pml4 & ~((uint64_t) 0xfff))){
-        dprintf("invlpg called\n");
+    if((cr3 & ~((uint64_t) 0xfff)) == ((uint64_t)k_pml4 & ~((uint64_t) 0xfff))){
         asm volatile("invlpg (%0)" :: "r"(addr));
     }
 }
@@ -81,8 +80,8 @@ void vmm_init(struct stivale2_struct* stivale2_struct){
     uint64_t kernel_base_virt = kernel_base_address->virtual_base_address;
 
 
-    pml4 = (uint64_t*)pmm_alloc_pages(1);
-    dprintf("pml4: %p\n", pml4);
+    k_pml4 = (uint64_t*)pmm_alloc_pages(1);
+    dprintf("pml4: %p\n", k_pml4);
     dprintf("kernel_base_phys: %llx\n", kernel_base_phys);
     dprintf("kernel_base_virt: %llx\n", kernel_base_virt);
 
@@ -92,12 +91,12 @@ void vmm_init(struct stivale2_struct* stivale2_struct){
     // }
 
     for (uint64_t i = 0; i < 0x200000; i += PAGE_SIZE){
-        vmm_map_page(pml4, (uint64_t) i + kernel_base_phys, (uint64_t) i + kernel_base_virt, 0b11);
+        vmm_map_page(k_pml4, (uint64_t) i + kernel_base_phys, (uint64_t) i + kernel_base_virt, 0b11);
     }
     
     for (uint64_t i = 0; i < 0x100000000; i += PAGE_SIZE){
-        vmm_map_page(pml4, i, (uint64_t) i, 0b11);
-        vmm_map_page(pml4, i, (uint64_t) i + HH_MEMORY, 0b11);
+        vmm_map_page(k_pml4, i, (uint64_t) i, 0b11);
+        vmm_map_page(k_pml4, i, (uint64_t) i + HH_MEMORY, 0b11);
     }
     dprintf("pagetables_end = %p\n", pagetables_end);
 
@@ -110,6 +109,6 @@ void vmm_init(struct stivale2_struct* stivale2_struct){
     // for (uint64_t i = 0; i < 0x100000000; i += PAGE_SIZE){
     //     vmm_map_page(pml4, i, HH_MEMORY + i, 0b11);
     // }
-    load_pml4((uint64_t)pml4);
+    load_pml4((uint64_t)k_pml4);
 }
 

@@ -32,5 +32,6 @@ typedef struct mcfg {
     uint64_t reserved;
 } __attribute__((packed)) mcfg_t;
 
+
 sdt_t* sdt_find(sdt_t* sdt, const char* signature);
 bool sdt_checksum(sdt_t* sdt);
