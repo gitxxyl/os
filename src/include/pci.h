@@ -25,10 +25,15 @@ typedef struct pci_device_header {
     uint8_t  BIST;
 }__attribute__((packed)) pci_device_header_t;
 
-void pci_enumerate(mcfg_t* mcfg);
 
-void pci_enumerate_bus(uint64_t base_addr, uint8_t bus);
+pci_device_header_t* pci_enumerate(mcfg_t* a_mcfg, uint16_t a_vendorid, uint16_t a_deviceid);
 
-void pci_enumerate_device(uint64_t bus_addr, uint8_t device);
+pci_device_header_t* pci_enumerate_bus(uint64_t base_addr, uint8_t bus, uint16_t a_vendorid, uint16_t a_deviceid);
+pci_device_header_t* pci_enumerate_device(uint64_t bus_addr, uint8_t device, uint16_t a_vendorid, uint16_t a_deviceid);
 
-void pci_enumerate_function(uint64_t device_addr, uint8_t function);
+pci_device_header_t* pci_enumerate_function(uint64_t device_addr, uint8_t function, uint16_t a_vendorid, uint16_t a_deviceid);
+extern const char* DeviceClasses[];
+const char* GetVendorName(uint16_t vendorID);
+const char* GetDeviceName(uint16_t vendorID, uint16_t deviceID);
+const char* GetSubclassName(uint8_t classCode, uint8_t subclassCode);
+const char* GetProgIFName(uint8_t classCode, uint8_t subclassCode, uint8_t progIF);

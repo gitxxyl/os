@@ -7,6 +7,7 @@
 #include <thirdparty/stivale2.h>
 #include <lib/assert.h>
 #include <include/vfs.h>
+#include <include/pci.h>
 #include <include/init.h>
 #include <include/targa.h>
 char cmd[256];
@@ -78,6 +79,16 @@ void shell_exec(char* cmd){
             printf("%s", tmp + strlen(argc) + 1);
         }
     }
+    else if (!strcmp(argc, "lspci")){
+        pci_device_header_t* device_header = pci_enumerate(NULL, 0x8086, NULL);
+        assert(device_header != NULL);
+        printf("PCI DEVICE: %s / %s / %s / %s / %s\n",
+            GetVendorName(device_header->vendor_id),
+            GetDeviceName(device_header->vendor_id, device_header->device_id),
+            DeviceClasses[device_header->class],
+            GetSubclassName(device_header->class, device_header->subclass),
+            GetProgIFName(device_header->class, device_header->subclass, device_header->progif));
+    }
     else if (!strcmp(argc, "clear")){
         // fb_changebg(0x00);
         tga_header_t* tga_header = (tga_header_t*) wpaper;
@@ -109,14 +120,15 @@ void shell_exec(char* cmd){
         }
     }
     else if (!strcmp(argc, "help")){
-        printf("Commands:\n");
-        printf("    clear\n");
-        printf("    time\n");
-        printf("    echo\n");
-        printf("    ls\n");
-        printf("    cat <filename>\n");
-        printf("    tga <filename>\n");
-        printf("    help");
+        printf("Commands:\n====================\n");
+        printf("clear\n");
+        printf("time\n");
+        printf("echo\n");
+        printf("ls\n");
+        printf("lspci\n");
+        printf("cat <filename>\n");
+        printf("tga <filename>\n");
+        printf("help\n====================");
     }
     else{
         fs_node_t* node = finddir_fs(root, argc);
