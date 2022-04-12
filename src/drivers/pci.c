@@ -51,7 +51,7 @@ pci_device_header_t* pci_enumerate_bus(uint64_t base_addr, uint8_t bus, uint16_t
     vmm_map_page(k_pml4, bus_addr, bus_addr, 0b11);
 
     pci_device_header_t* device_header = (pci_device_header_t*)bus_addr;
-    if(device_header->vendor_id == 0xFFFF || device_header->device_id == 0xFFFF || device_header->device_id == 0x0) return;
+    if(device_header->vendor_id == 0xFFFF || device_header->device_id == 0xFFFF || device_header->device_id == 0x0) return NULL;
 
     for(uint64_t device = 0; device < 32; device++){
         pci_device_header_t* ret_hdr = pci_enumerate_device(bus_addr, device, a_vendorid, a_deviceid);
@@ -66,7 +66,7 @@ pci_device_header_t* pci_enumerate_device(uint64_t bus_addr, uint8_t device, uin
     vmm_map_page(k_pml4, device_addr, device_addr, 0b11);
 
     pci_device_header_t* device_header = (pci_device_header_t*)device_addr;
-    if(device_header->vendor_id == 0xFFFF || device_header->device_id == 0xFFFF || device_header->device_id == 0x0) return;
+    if(device_header->vendor_id == 0xFFFF || device_header->device_id == 0xFFFF || device_header->device_id == 0x0) return NULL;
 
     for(uint64_t function = 0; function < 8; function++){
         pci_device_header_t* func_header = pci_enumerate_function(device_addr, function, a_vendorid, a_deviceid);
@@ -81,7 +81,7 @@ pci_device_header_t* pci_enumerate_function(uint64_t device_addr, uint8_t functi
     vmm_map_page(k_pml4, function_addr, function, 0b11);
 
     pci_device_header_t* device_header = (pci_device_header_t*)function_addr;
-    if(device_header->vendor_id == 0xFFFF || device_header->device_id == 0xFFFF || device_header->device_id == 0x0) return;
+    if(device_header->vendor_id == 0xFFFF || device_header->device_id == 0xFFFF || device_header->device_id == 0x0) return NULL;
     printf("PCI DEVICE: %x:%x / %s / %s / %s / %s / %s\n",
         device_header->vendor_id,
         device_header->device_id,
