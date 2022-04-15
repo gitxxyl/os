@@ -5,6 +5,7 @@
 #include <include/kheap.h>
 
 #include <lib/alloc.h>
+#include <lib/panic.h>
 #include <lib/assert.h>
 #include <lib/printf.h>
 #include <lib/ordered_array.h>
@@ -93,7 +94,7 @@ void* alloc(uint64_t size, bool page_align, heap_t* heap){
             dprintf("[heap] %p, size = %llx\n", lookup_ordered_array(j, &heap->index), ((header_t*)lookup_ordered_array(j, &heap->index))->size);
             dprintf("requested size = %llx\n", realsize);
         }
-        assert(false);
+        panic("Heap out of memory");
     }
  
     header_t* old_header = (header_t*)lookup_ordered_array(i, &heap->index);
