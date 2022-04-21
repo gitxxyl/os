@@ -19,7 +19,12 @@ CFLAGS ?= -O2 -g -Wall -Wextra -pipe -nostdlib -Wno-unused-parameter -Wno-int-to
 # User controllable linker flags. We set none by default.
 LDFLAGS ?=
 
-QEMUFLAGS ?= -bios /usr/share/ovmf/OVMF.fd -nic model=e1000, -machine q35 --serial stdio -D ../log.txt -d int -m 512M -cpu qemu64 --no-reboot --no-shutdown -rtc base=localtime -M smm=off
+QEMUFLAGS ?= 	-bios /usr/share/ovmf/OVMF.fd \
+				--serial stdio -D ../log.txt -d int -M smm=off \
+				-m 512M -cpu qemu64 -machine q35 \
+				--no-reboot --no-shutdown \
+				-rtc base=localtime -nic model=e1000 \
+				-enable-kvm
 
 # Internal C flags that should not be changed by the user.
 override INTERNALCFLAGS :=   \
