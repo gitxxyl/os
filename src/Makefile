@@ -2,16 +2,14 @@ override KERNEL := os.elf
 # We are only using "cc" as a placeholder here. It may work by using
 # the host system's toolchain, but this is not guaranteed.
 ifeq ($(origin CC), default)
-CC := x86_64-elf-gcc
+CC := gcc
 endif
 
 # Likewise, "ld" here is just a placeholder and your mileage may vary if using the
 # host's "ld".
 ifeq ($(origin LD), default)
-LD := x86_64-elf-ld
+LD := ld
 endif
-
-AS := x86_64-elf-as
 
 # User controllable CFLAGS.
 CFLAGS ?= -O2 -g -Wall -Wextra -pipe -nostdlib -Wno-unused-parameter -Wno-int-to-pointer-cast -gdwarf-2
@@ -58,8 +56,21 @@ override HEADER_DEPS := $(CFILES:.c=.d)
 
 # Default target.
 .PHONY: all
+
 all: $(KERNEL)
-	@../iso.sh
+# modify this as ../make_initrd <source1 filename> <dest1 filename> <source1 filename> <dest1 filename> etc..
+	@../make_initrd
+	@mv initrd.img ../iso_root
+	@if [ ! -d "../limine" ]; then git clone https://github.com/limine-bootloader/limine.git ../limine --branch=v2.0-branch-binary --depth=1; make -C ../limine; fi;
+	@mkdir -p ../iso_root
+	@cp -v os.elf ../limine.cfg ../limine/limine.sys \
+		../limine/limine-cd.bin ../limine/limine-eltorito-efi.bin ../iso_root/
+	@xorriso -as mkisofs -b limine-cd.bin \
+			-no-emul-boot -boot-load-size 4 -boot-info-table \
+			--efi-boot limine-eltorito-efi.bin \
+			-efi-boot-part --efi-boot-image --protective-msdos-label \
+			../iso_root -o image.iso
+	@../limine/limine-install-linux-x86_64 image.iso
 	@qemu-system-x86_64 image.iso $(QEMUFLAGS)
 	@make clean -s
 gdb: $(KERNEL)

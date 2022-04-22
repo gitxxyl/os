@@ -9,5 +9,4 @@ limine
 *.d
 *.iso 
 *.img
-*.elf 
-make_initrd
+*.elf

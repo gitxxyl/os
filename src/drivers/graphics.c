@@ -88,7 +88,7 @@ void fb_printchar(char c){
                 ssfn_dst.x = fb.width - CHARACTER_WIDTH;
                 ssfn_dst.y -= CHARACTER_HEIGHT;
             }
-            // ssfn_dst.bg = ((uint64_t*)fb.addr)[ssfn_dst.x + ssfn_dst.y * fb.pitch / 4];
+            ssfn_dst.bg = ((uint64_t*)fb.addr)[ssfn_dst.x + ssfn_dst.y * fb.pitch / 4];
             ssfn_putc(' ');
             if(ssfn_dst.x == 0 && ssfn_dst.y == 0) break;
             if(ssfn_dst.x > 0) ssfn_dst.x -= CHARACTER_WIDTH;
@@ -217,7 +217,7 @@ void display_bmp(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint8_
     uint32_t* fb_ptr = (uint32_t*) fb.addr;
     for(uint32_t i = 0; i < height; i++){
         for(uint32_t j = 0; j < width; j++){
-            if(i == 0 && j < 2) continue;
+            //if(i == 0 && j < 2) continue;
             uint32_t color = bmp[i * width + j];
             fb_plotpixel(x + j, y + i, color);
         }
