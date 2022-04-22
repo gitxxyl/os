@@ -60,9 +60,9 @@ override HEADER_DEPS := $(CFILES:.c=.d)
 all: $(KERNEL)
 # modify this as ../make_initrd <source1 filename> <dest1 filename> <source1 filename> <dest1 filename> etc..
 	@../make_initrd
+	@mkdir -p ../iso_root
 	@mv initrd.img ../iso_root
 	@if [ ! -d "../limine" ]; then git clone https://github.com/limine-bootloader/limine.git ../limine --branch=v2.0-branch-binary --depth=1; make -C ../limine; fi;
-	@mkdir -p ../iso_root
 	@cp -v os.elf ../limine.cfg ../limine/limine.sys \
 		../limine/limine-cd.bin ../limine/limine-eltorito-efi.bin ../iso_root/
 	@xorriso -as mkisofs -b limine-cd.bin \
