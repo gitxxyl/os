@@ -74,6 +74,7 @@ void fb_changefg(uint32_t color){
 uint32_t fb_getfg(){
     return ssfn_dst.fg;
 }
+extern char* wpaper;
 void fb_printchar(char c){
     switch(c){
         case '\n':
@@ -88,7 +89,9 @@ void fb_printchar(char c){
                 ssfn_dst.x = fb.width - CHARACTER_WIDTH;
                 ssfn_dst.y -= CHARACTER_HEIGHT;
             }
-            ssfn_dst.bg = ((uint64_t*)fb.addr)[ssfn_dst.x + ssfn_dst.y * fb.pitch / 4];
+            if(wpaper != NULL) {
+                ssfn_dst.bg = ((uint64_t*)fb.addr)[ssfn_dst.x + ssfn_dst.y * fb.pitch / 4];
+            } else ssfn_dst.bg = 0xFF000000;
             ssfn_putc(' ');
             if(ssfn_dst.x == 0 && ssfn_dst.y == 0) break;
             if(ssfn_dst.x > 0) ssfn_dst.x -= CHARACTER_WIDTH;

@@ -8,6 +8,7 @@
 #include <lib/assert.h>
 #include <include/vfs.h>
 #include <include/pci.h>
+#include <include/graphics.h>
 #include <include/init.h>
 #include <include/targa.h>
 char cmd[256];
@@ -92,9 +93,13 @@ void shell_exec(char* cmd){
     }
     else if (!strcmp(argc, "clear")){
         // fb_changebg(0x00);
-        tga_header_t* tga_header = (tga_header_t*) wpaper;
-        dprintf("h = %d, w = %d\n", tga_header->h, tga_header->w);
-        display_bmp(0, 0, tga_header->h, tga_header->w, wpaper, true);
+        if(wpaper != NULL) {
+            tga_header_t* tga_header = (tga_header_t*) wpaper;
+            dprintf("h = %d, w = %d\n", tga_header->h, tga_header->w);
+            display_bmp(0, 0, tga_header->h, tga_header->w, wpaper, true);
+        } else {
+            fb_clear();
+        }
     }
     else if (!strcmp(argc, "time")){
         uint64_t ticks = get_ticks();
