@@ -20,7 +20,7 @@ LDFLAGS ?=
 
 QEMUFLAGS ?= 	-bios /usr/share/ovmf/OVMF.fd \
 				--serial stdio -D ../log.txt -d int -M smm=off \
-				-m 512M -cpu qemu64 -machine q35 \
+				-m 5G -cpu qemu64 -machine q35 \
 				--no-reboot --no-shutdown \
 				-rtc base=localtime -nic model=e1000 \
 				-enable-kvm
@@ -57,14 +57,17 @@ override HEADER_DEPS := $(CFILES:.c=.d)
 
 # Default target.
 .PHONY: all
-all: $(KERNEL)
+all: $(ISO)
 	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS)
+	@make clean -s
 
-run: $(KERNEL)
+run: $(ISO)
 	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS)
+	@make clean -s
 
 gdb: $(ISO)
 	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS) -s -S
+	@make clean -s
 
 $(ISO): $(KERNEL)
 # modify this as ../make_initrd <source1 filename> <dest1 filename> <source1 filename> <dest1 filename> etc..
@@ -81,7 +84,6 @@ $(ISO): $(KERNEL)
                 -efi-boot-part --efi-boot-image --protective-msdos-label \
                 ../iso_root -o $(ISO)
 	@../limine/limine-deploy $(ISO)
-	@make clean -s
 
 $(KERNEL): $(OBJ)
 	@$(LD) $(OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@
@@ -96,8 +98,4 @@ $(KERNEL): $(OBJ)
 # Remove object files and the final executable.
 .PHONY: clean
 clean:
-	@rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) 
-
-.PHONY: distclean
-distclean: clean
-	@rm -f stivale2.h
+	@rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) $(ISO)
