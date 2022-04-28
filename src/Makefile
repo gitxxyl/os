@@ -62,7 +62,8 @@ all: $(KERNEL)
 	@../make_initrd
 	@mkdir -p ../iso_root
 	@mv initrd.img ../iso_root
-	@make -C ../limine;
+	@git submodule update --remote
+	@make -C ../limine
 	@cp -v os.elf \
 		../limine.cfg ../limine/limine.sys ../limine/limine-cd.bin ../limine/limine-cd-efi.bin ../iso_root/
 	xorriso -as mkisofs -b limine-cd.bin \
