@@ -2,7 +2,6 @@ iso.sh
 log.txt
 .vscode
 iso_root
-limine 
 *.iso
 *.o
 *.d

@@ -62,7 +62,7 @@ all: $(KERNEL)
 	@../make_initrd
 	@mkdir -p ../iso_root
 	@mv initrd.img ../iso_root
-	@if [ ! -d "../limine" ]; then git clone https://github.com/limine-bootloader/limine.git ../limine --branch=v3.0-branch-binary --depth=1; make -C ../limine; fi;
+	@make -C ../limine;
 	@cp -v os.elf \
 		../limine.cfg ../limine/limine.sys ../limine/limine-cd.bin ../limine/limine-cd-efi.bin ../iso_root/
 	xorriso -as mkisofs -b limine-cd.bin \
