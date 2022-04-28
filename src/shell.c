@@ -72,6 +72,7 @@ extern char* wpaper;
 void shell_exec(char* cmd){
     char* tmp = kmalloc(256);
     strcpy(tmp, cmd);
+    tmp[strlen(tmp)] = '\0';
     char* argc = split(tmp, ' ')[0];
     printf("\n");
     dprintf("arg: %s\n", argc);
@@ -154,19 +155,6 @@ void shell_exec(char* cmd){
 }
 
 void shell_init(struct stivale2_struct *stivale2_struct){
-    fs_node_t* tga = finddir_fs(root, "wpaper.tga");
-    if(tga != NULL){
-        wpaper = kmalloc(tga->length);
-        read_fs(tga, wpaper, tga->length, 0);
-        tga_header_t* tga_header = (tga_header_t*) wpaper;
-        dprintf("h = %d, w = %d\n", tga_header->h, tga_header->w);
-        display_bmp(0, 0, tga_header->h, tga_header->w, wpaper, true);
-    }
-    else {
-        fb_clear();
-    }
-
-
     printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
     printf_c(0xFF00FF00, "Type help for a list of commands.\n");
     printf_c(0xFF00FF00, "\nksh> ");
