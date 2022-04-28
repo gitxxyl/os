@@ -1,4 +1,5 @@
 override KERNEL := os.elf
+override ISO	:= image.iso
 # We are only using "cc" as a placeholder here. It may work by using
 # the host system's toolchain, but this is not guaranteed.
 ifeq ($(origin CC), default)
@@ -56,8 +57,16 @@ override HEADER_DEPS := $(CFILES:.c=.d)
 
 # Default target.
 .PHONY: all
-
 all: $(KERNEL)
+	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS)
+
+run: $(KERNEL)
+	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS)
+
+gdb: $(ISO)
+	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS) -s -S
+
+$(ISO): $(KERNEL)
 # modify this as ../make_initrd <source1 filename> <dest1 filename> <source1 filename> <dest1 filename> etc..
 	@../make_initrd
 	@mkdir -p ../iso_root
@@ -70,13 +79,8 @@ all: $(KERNEL)
                 -no-emul-boot -boot-load-size 4 -boot-info-table \
                 --efi-boot limine-cd-efi.bin \
                 -efi-boot-part --efi-boot-image --protective-msdos-label \
-                ../iso_root -o image.iso
-	@../limine/limine-deploy image.iso
-	@qemu-system-x86_64 image.iso $(QEMUFLAGS)
-	@make clean -s
-gdb: $(KERNEL)
-	@../iso.sh
-	@qemu-system-x86_64 image.iso $(QEMUFLAGS) -s -S
+                ../iso_root -o $(ISO)
+	@../limine/limine-deploy $(ISO)
 	@make clean -s
 
 $(KERNEL): $(OBJ)
@@ -92,7 +96,7 @@ $(KERNEL): $(OBJ)
 # Remove object files and the final executable.
 .PHONY: clean
 clean:
-	@rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) # image.iso
+	@rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) 
 
 .PHONY: distclean
 distclean: clean
