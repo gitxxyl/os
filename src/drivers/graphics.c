@@ -1,6 +1,5 @@
 /**
- * CGA Framebuffer driver with SSFN font and 24 bit color.
- * https://wiki.osdev.org/Scalable_Screen_Font 
+ * CGA Framebuffer driver with limine terminal.
  * functions: graphics_init(), fb_plotpixel(), fb_changebg(), fb_printchar(), fb_print(), fb_print_color(), fb_print_bits()
  **/
 
@@ -14,7 +13,6 @@
 #include <include/stivale_tag.h>
 #include <lib/printf.h>
 #include <lib/string.h> 
-#include <thirdparty/ssfn.h>
 
 #define CHARACTER_WIDTH 8
 #define CHARACTER_HEIGHT 16 
@@ -23,7 +21,7 @@ uint64_t framebuffer_addr;
 struct fb_struct fb;
 
 extern uint8_t _binary_sfn_fonts_unifont_sfn_start;
-
+void (*term_write)(const char *string, size_t length);
 void fb_changebg(uint32_t color);
 void graphics_init(struct stivale2_struct *stivale2_struct, uint32_t bgcolor, uint32_t fgcolor){
     struct stivale2_struct_tag_framebuffer* framebuffer_tag;
@@ -40,20 +38,8 @@ void graphics_init(struct stivale2_struct *stivale2_struct, uint32_t bgcolor, ui
     fb.height = framebuffer_tag->framebuffer_height;
     fb.bpp = framebuffer_tag->framebuffer_bpp;
     fb.pitch = framebuffer_tag->framebuffer_pitch;
-
-    ssfn_src = (ssfn_font_t*) &_binary_sfn_fonts_unifont_sfn_start;
-    ssfn_dst.ptr = (uint8_t*) fb.addr;
-    ssfn_dst.w = fb.width;
-    ssfn_dst.h = fb.height;
-    ssfn_dst.p = fb.pitch;
-    ssfn_dst.x = 0;
-    ssfn_dst.y = 0;
-
-
-    fb_changebg(bgcolor);
-    ssfn_dst.fg = fgcolor;
-
-    // fb_print("(Black screen with text; The sound of buzzing bees can be heard) Narrator: According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible. (Barry is picking out a shirt) Barry: Yellow, black. Yellow, black. Yellow, black. Yellow, black. Ooh, black and yellow! Let's shake it up a little. Janet: Barry! Breakfast is ready! Barry: Coming! Hang on a second. (Barry uses his antenna like a phone) Barry: Hello (Through phone) Adam: Barry? Barry: Adam? Adam: Can you believe this is happening? Barry: I can't. I'll pick you up. (Barry flies down the stairs) Martin: Looking sharp. Janet: Use the stairs. Your father paid good money for those. Barry: Sorry. I'm excited.");
+    struct stivale2_struct_tag_terminal *terminal_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_TERMINAL_ID);
+    term_write = (void*) terminal_tag->term_write;
 }
 void fb_plotpixel(int32_t x, int32_t y, uint32_t color){
     size_t fb_index = y * (fb.pitch / 4) + x;
@@ -61,71 +47,28 @@ void fb_plotpixel(int32_t x, int32_t y, uint32_t color){
     fb_ptr[fb_index] = color;
 }
 void fb_changebg(uint32_t color){
-    ssfn_dst.bg = color;
     for (int y = 0; y < fb.height; y++){
         for(int x = 0; x < fb.width; x++){
             fb_plotpixel(x,y,color);
         }
     }
 }
-void fb_changefg(uint32_t color){
-    ssfn_dst.fg = color;
-}
-uint32_t fb_getfg(){
-    return ssfn_dst.fg;
-}
-extern char* wpaper;
 void fb_printchar(char c){
-    switch(c){
-        case '\n':
-            ssfn_dst.x = 0;
-            ssfn_dst.y += CHARACTER_HEIGHT;
-            break;
-        case '\b':
-            if(ssfn_dst.x < 6 * CHARACTER_WIDTH) break;
-            if(ssfn_dst.x == 0 && ssfn_dst.y == 0) break;
-            if(ssfn_dst.x > 0) ssfn_dst.x -= CHARACTER_WIDTH;
-            else{
-                ssfn_dst.x = fb.width - CHARACTER_WIDTH;
-                ssfn_dst.y -= CHARACTER_HEIGHT;
-            }
-            if(wpaper != NULL) {
-                ssfn_dst.bg = ((uint64_t*)fb.addr)[ssfn_dst.x + ssfn_dst.y * fb.pitch / 4];
-            } else ssfn_dst.bg = 0xFF000000;
-            ssfn_putc(' ');
-            if(ssfn_dst.x == 0 && ssfn_dst.y == 0) break;
-            if(ssfn_dst.x > 0) ssfn_dst.x -= CHARACTER_WIDTH;
-            else{
-                ssfn_dst.x = fb.width - CHARACTER_WIDTH;
-                ssfn_dst.y -= CHARACTER_HEIGHT;
-            }
-            break;
-        default:
-            ssfn_putc(c);
-            if(ssfn_dst.x >= fb.width){
-                ssfn_dst.y += CHARACTER_HEIGHT;
-                ssfn_dst.x = 0;
-            }
-            break;
-    }
+    char ch[2];
+    ch[0] = c;
+    ch[1] = '\0';
+    term_write(ch, 1);
 }
 void _putchar(char character){
     fb_printchar(character);
 }
 void fb_clear(){
-    fb_changebg(0x00);
-    ssfn_dst.x = 0; ssfn_dst.y = 0;
+    fb_print("\033[2J\033[H");
 }
 void fb_print(char* str){
     for(uint32_t i = 0; i < strlen(str); i++){
         fb_printchar(str[i]);
     }   
-}
-void fb_print_color(char* str, uint32_t color){
-    uint32_t tmp = ssfn_dst.fg;
-    ssfn_dst.fg = color;
-    fb_print(str);
-    ssfn_dst.fg = tmp;
 }
 
 unsigned int *tga_parse(unsigned char *ptr, int size)
@@ -226,5 +169,5 @@ void display_bmp(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint8_
         }
     }
     kfree(bmp);
-    if(clear){ssfn_dst.x = 0; ssfn_dst.y = 0;}
+    if(clear){fb_print("\033[H");}
 }

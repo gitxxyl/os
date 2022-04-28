@@ -879,16 +879,15 @@ int printf_(const char* format, ...)
   va_end(va);
   return ret;
 }
-int printf_c_(int color, const char* format, ...)
+int printf_c_(char* color, const char* format, ...)
 {
-  uint32_t tmpc = fb_getfg();
-  fb_changefg(color);
+  fb_print(color);
   va_list va;
   va_start(va, format);
   char buffer[1];
   const int ret = _vsnprintf(_out_char, buffer, (size_t)-1, format, va);
   va_end(va);
-  fb_changefg(tmpc);
+  fb_print(RESET);
   return ret;
 }
 

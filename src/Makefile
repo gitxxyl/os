@@ -62,15 +62,15 @@ all: $(KERNEL)
 	@../make_initrd
 	@mkdir -p ../iso_root
 	@mv initrd.img ../iso_root
-	@if [ ! -d "../limine" ]; then git clone https://github.com/limine-bootloader/limine.git ../limine --branch=v2.0-branch-binary --depth=1; make -C ../limine; fi;
-	@cp -v os.elf ../limine.cfg ../limine/limine.sys \
-		../limine/limine-cd.bin ../limine/limine-eltorito-efi.bin ../iso_root/
-	@xorriso -as mkisofs -b limine-cd.bin \
-			-no-emul-boot -boot-load-size 4 -boot-info-table \
-			--efi-boot limine-eltorito-efi.bin \
-			-efi-boot-part --efi-boot-image --protective-msdos-label \
-			../iso_root -o image.iso
-	@../limine/limine-install-linux-x86_64 image.iso
+	@if [ ! -d "../limine" ]; then git clone https://github.com/limine-bootloader/limine.git ../limine --branch=v3.0-branch-binary --depth=1; make -C ../limine; fi;
+	@cp -v os.elf \
+		../limine.cfg ../limine/limine.sys ../limine/limine-cd.bin ../limine/limine-cd-efi.bin ../iso_root/
+	xorriso -as mkisofs -b limine-cd.bin \
+                -no-emul-boot -boot-load-size 4 -boot-info-table \
+                --efi-boot limine-cd-efi.bin \
+                -efi-boot-part --efi-boot-image --protective-msdos-label \
+                ../iso_root -o image.iso
+	@../limine/limine-deploy image.iso
 	@qemu-system-x86_64 image.iso $(QEMUFLAGS)
 	@make clean -s
 gdb: $(KERNEL)
@@ -79,8 +79,7 @@ gdb: $(KERNEL)
 	@make clean -s
 
 $(KERNEL): $(OBJ)
-	@$(LD) -r -b binary -o sfn_fonts/font_unifont.o sfn_fonts/unifont.sfn
-	@$(LD) sfn_fonts/font_unifont.o $(OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@
+	@$(LD) $(OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@
 
 %.o: %.asm 
 	@nasm -felf64 $< -o $@

@@ -151,11 +151,11 @@ void shell_exec(char* cmd){
         }
     }
     kfree(tmp);
-    printf_c(0xFF00FF00, "\nksh> ");
+    printf_c(GREEN, "\nksh> ");
 }
 
 void shell_init(struct stivale2_struct *stivale2_struct){
-    printf_c(0xFF00FF00, "\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
-    printf_c(0xFF00FF00, "Type help for a list of commands.\n");
-    printf_c(0xFF00FF00, "\nksh> ");
+    printf_c(GREEN, "\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
+    printf_c(GREEN, "Type help for a list of commands.\n");
+    printf_c(GREEN, "\nksh> ");
 }

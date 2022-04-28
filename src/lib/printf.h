@@ -40,6 +40,15 @@
 extern "C" {
 #endif
 
+#define RED     "\033[31m"
+#define GREEN   "\033[32m"
+#define YELLOW  "\033[33m"
+#define BLUE    "\033[34m"
+#define MAGENTA "\033[35m"
+#define CYAN    "\033[36m"
+#define WHITE   "\033[37m"
+#define RESET   "\033[0m"
+
 
 /**
  * Output a character to a custom device like UART, used by the printf() function
@@ -62,7 +71,7 @@ void _dputchar(char character);
 int printf_(const char* format, ...);
 
 #define printf_c printf_c_
-int printf_c_(int color, const char* format, ...);
+int printf_c_(char* color, const char* format, ...);
 
 #define dprintf dprintf_
 int dprintf_(const char* format, ...);
