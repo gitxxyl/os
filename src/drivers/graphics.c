@@ -58,6 +58,9 @@ void fb_printchar(char c){
     ch[0] = c;
     ch[1] = '\0';
     term_write(ch, 1);
+    if(c == '\b'){
+        fb_print("\033[0J");
+    }
 }
 void _putchar(char character){
     fb_printchar(character);
