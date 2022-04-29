@@ -17,7 +17,7 @@
 #include <include/paging.h>
 #include <include/interrupts.h>
 
-#include <stivale2.h>
+#include <thirdparty/stivale2.h>
 
 uint64_t* k_pml4 = 0;
 uint64_t pagetables_end;
