@@ -7,4 +7,6 @@ iso_root
 *.d
 *.iso 
 *.img
+*.txt
+*.tga
 *.elf
