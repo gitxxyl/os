@@ -57,15 +57,15 @@ override HEADER_DEPS := $(CFILES:.c=.d)
 
 # Default target.
 .PHONY: all
-all: $(ISO)
-	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS)
-# @make clean -s
-
-run: $(ISO)
+all: $(KERNEL) $(ISO)
 	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS)
 	@make clean -s
 
-gdb: $(ISO)
+run: $(KERNEL) $(ISO)
+	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS)
+	@make clean -s
+
+gdb: $(KERNEL) $(ISO)
 	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS) -s -S
 	@make clean -s
 
@@ -102,4 +102,4 @@ $(KERNEL): $(OBJ)
 # Remove object files and the final executable.
 .PHONY: clean
 clean:
-	@rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) $(ISO)
+	@rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) 
