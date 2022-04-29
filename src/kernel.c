@@ -68,47 +68,19 @@ void* stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
 
 void _start(struct stivale2_struct *stivale2_struct)
 {
-    serial_init();
-    dprint("\n\n");
     graphics_init(stivale2_struct, 0xFF000000, 0xFFFFFFFF);
-    printf_c(GREEN, "Framebuffer initialised.\n");
-    printf_c(GREEN, "Serial port initialised.\n");
-    
-
+    serial_init();
     interrupts_init();
-    printf_c(GREEN, "Interrupts initialised.\n");
     keyboard_init();
-    printf_c(GREEN, "Keyboard initialised.\n");
     timer_init(1000);
-    printf_c(GREEN, "Timer initialised.\n");
-    
     pmm_init(stivale2_struct);
-    printf_c(GREEN, "Physical memory manager initialised.\n");
     vmm_init(stivale2_struct);
-    printf_c(GREEN, "Virtual memory manager initialised.\n");
     heap_init();
-    printf_c(GREEN, "Heap initialised.\n");
-
     pci_init(stivale2_struct);
-
-    struct stivale2_struct_tag_modules *modules_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MODULES_ID);
-    assert(modules_tag != NULL);
-    assert(modules_tag->module_count > 0);
-    uint32_t* initrd_addr = modules_tag->modules[0].begin;
-    dprintf("module %s, %x\n", modules_tag->modules[0].string, *initrd_addr);
-    root = initrd_init(initrd_addr);
-    dprintf("Initrd initialised.\n");
-
+    root = initrd_init(stivale2_struct);
     shell_init(stivale2_struct);
     dprintf("\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
 
-
-    // No more proactive code from here, all initialization must be completed
     asm("sti");
-    
-    // asm volatile ("int3"); // breakpoint exception for interrupt debugging
-    for (;;)
-    {
-        asm("hlt");
-    }
+    for (;;) asm("hlt");
 }

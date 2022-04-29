@@ -74,21 +74,20 @@ void invlpg(uint64_t addr){
 }
 
 void vmm_init(struct stivale2_struct* stivale2_struct){
+    printf("[VIRTMM]");
     struct stivale2_struct_tag_kernel_base_address* kernel_base_address = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_KERNEL_BASE_ADDRESS_ID);
     assert(kernel_base_address != NULL);
     uint64_t kernel_base_phys = kernel_base_address->physical_base_address;
     uint64_t kernel_base_virt = kernel_base_address->virtual_base_address;
 
+    struct stivale2_struct_tag_hhdm* hhdm = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_HHDM_ID);
+    uint64_t hhdm_virt = hhdm->addr;
 
     k_pml4 = (uint64_t*)pmm_alloc_pages(1);
     dprintf("pml4: %p\n", k_pml4);
     dprintf("kernel_base_phys: %llx\n", kernel_base_phys);
     dprintf("kernel_base_virt: %llx\n", kernel_base_virt);
-
-    // // identity map the first 4gb
-    // for (uint64_t i = 0; i < 0x100000000; i += PAGE_SIZE){
-    //     vmm_map_page(pml4, i, i, 0b11);
-    // }
+    dprintf("hhdm_virt: %llx\n", hhdm_virt);
 
     for (uint64_t i = 0; i < 0x200000; i += PAGE_SIZE){
         vmm_map_page(k_pml4, (uint64_t) i + kernel_base_phys, (uint64_t) i + kernel_base_virt, 0b11);
@@ -98,17 +97,22 @@ void vmm_init(struct stivale2_struct* stivale2_struct){
         vmm_map_page(k_pml4, i, (uint64_t) i, 0b11);
         vmm_map_page(k_pml4, i, (uint64_t) i + HH_MEMORY, 0b11);
     }
+
+    struct stivale2_struct_tag_memmap* mmap_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MEMMAP_ID);
+    assert(mmap_tag != NULL);
+    dprintf("entries: %llx", mmap_tag->entries);
+    for(uint64_t i = 0; i < mmap_tag->entries; i++){
+        uint64_t base = mmap_tag->memmap[i].base;
+        if(base < 0x4000000) continue;
+        dprintf("mapping extra");
+        uint64_t length = mmap_tag->memmap[i].length;
+        for(uint64_t j = 0; j < length; j += PAGE_SIZE){
+            vmm_map_page(k_pml4, base + j, base + j, 0b11);
+            vmm_map_page(k_pml4, base + j, base + j + HH_MEMORY, 0b11);
+        }
+    }
     dprintf("pagetables_end = %p\n", pagetables_end);
-
-    // for (uint64_t i = 0x2000000; i < 0x100000000; i += PAGE_SIZE){
-    //     vmm_map_page(pml4, i, i, 0b11);
-    //     vmm_map_page(pml4, i, i + HH_MEMORY, 0b11);
-    // }
-
-    // // map first 4gb to higher half offset
-    // for (uint64_t i = 0; i < 0x100000000; i += PAGE_SIZE){
-    //     vmm_map_page(pml4, i, HH_MEMORY + i, 0b11);
-    // }
     load_pml4((uint64_t)k_pml4);
+    printf_c(GREEN, " Initialized\n");
 }
 

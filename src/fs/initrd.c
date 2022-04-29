@@ -4,6 +4,8 @@
 
 #include <include/vfs.h>
 #include <include/initrd.h>
+#include <thirdparty/stivale2.h>
+#include <lib/assert.h>
 #include <lib/memory.h>
 #include <lib/printf.h>
 #include <lib/string.h>
@@ -54,7 +56,14 @@ static fs_node_t* initrd_finddir(fs_node_t* node, char* name){
     return 0;
 }
 
-fs_node_t* initrd_init(uint64_t addr){
+fs_node_t* initrd_init(struct stivale2_struct* stivale2_struct){
+    printf("[INITRD]");
+    struct stivale2_struct_tag_modules *modules_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MODULES_ID);
+    assert(modules_tag != NULL);
+    assert(modules_tag->module_count > 0);
+    uint64_t* initrd_addr = modules_tag->modules[0].begin;
+    uint64_t addr = (uint64_t) initrd_addr;
+
     initrd_header = (initrd_header_t *)addr;
     initrd_file_headers = (initrd_file_header_t *) (addr+sizeof(initrd_header_t)); 
 
@@ -103,5 +112,7 @@ fs_node_t* initrd_init(uint64_t addr){
         root_nodes[i].close = 0;
         root_nodes[i].impl = 0;
     }
+    dprintf("Initrd initialised.\n");
+    printf_c(GREEN, " Initialized\n");
     return initrd_root;
 }

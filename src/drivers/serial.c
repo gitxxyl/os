@@ -1,6 +1,7 @@
 #include <lib/port.h>
 #include <stdint.h>
 #include <lib/string.h>
+#include <lib/printf.h>
 
 #define PORT 0x3f8 // serial COM1 port
 
@@ -10,6 +11,7 @@
  **/
 
 uint32_t serial_init(){
+    printf("[SERIAL]");
     outb(PORT + 1, 0x00);
     outb(PORT + 3, 0x80);
     outb(PORT + 0, 0x03);
@@ -23,6 +25,7 @@ uint32_t serial_init(){
         return 1;
     }
     outb(PORT + 4, 0x0F);
+    printf_c(GREEN, " Initialized\n");
     return 0;
 }
 static uint32_t is_transmit_empty(){

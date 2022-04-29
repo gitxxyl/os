@@ -1,6 +1,7 @@
 #include <lib/port.h>
 #include <include/interrupts.h>
 #include <include/graphics.h>
+#include <lib/printf.h>
 #include <stdint.h>
 
 // scancode : key map for US keyboard
@@ -142,5 +143,7 @@ void keyboard_handler(registers_t* r){
 }
 
 void keyboard_init(){
+    printf("[PS2KBD]");
     isr_install_handler(33, keyboard_handler);
+    printf_c(GREEN, " Initialized\n");
 }

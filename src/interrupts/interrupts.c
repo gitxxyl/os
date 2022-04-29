@@ -12,6 +12,7 @@ void remap_pic();
 void idt_set_gate(uint32_t vector, uint64_t offset);
 
 void interrupts_init(){
+    printf("[IDT]   ");
     // register ISR gates in the IDT - 0 to 47 for now
     load_isr(); 
 
@@ -22,6 +23,7 @@ void interrupts_init(){
 
     // load the IDT from idt_ptr
     load_idt();
+    printf_c(GREEN, " Initialized\n");
 }
 
 idt_gate_t idt[IDT_ENTRIES];

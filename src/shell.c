@@ -67,8 +67,6 @@ void tga(char* filename){
     display_bmp(1280 - tga_header->w * 2, 0, tga_header->h, tga_header->w, img, false);
 }
 
-extern char* wpaper; 
-
 void shell_exec(char* cmd){
     char* tmp = kmalloc(256);
     strcpy(tmp, cmd);
@@ -82,26 +80,20 @@ void shell_exec(char* cmd){
         }
     }
     else if (!strcmp(argc, "lspci")){
-        pci_device_header_t* device_header = pci_enumerate(NULL, 0x8086, NULL);
-        if(device_header->device_id != 0xFFFF && device_header->vendor_id != 0xFFFF){
-            printf("PCI DEVICE: %s / %s / %s / %s / %s\n",
-                GetVendorName(device_header->vendor_id),
-                GetDeviceName(device_header->vendor_id, device_header->device_id),
-                DeviceClasses[device_header->class],
-                GetSubclassName(device_header->class, device_header->subclass),
-                GetProgIFName(device_header->class, device_header->subclass, device_header->progif));
-        }
+        // pci_device_header_t* device_header = pci_enumerate(NULL, 0x8086, NULL);
+        // if(device_header->device_id != 0xFFFF && device_header->vendor_id != 0xFFFF){
+        //     printf("PCI DEVICE: %s / %s / %s / %s / %s\n",
+        //         GetVendorName(device_header->vendor_id),
+        //         GetDeviceName(device_header->vendor_id, device_header->device_id),
+        //         DeviceClasses[device_header->class],
+        //         GetSubclassName(device_header->class, device_header->subclass),
+        //         GetProgIFName(device_header->class, device_header->subclass, device_header->progif));
+        // }
     }
     else if (!strcmp(argc, "clear")){
         // fb_changebg(0x00);
-        if(wpaper != NULL) {
-            tga_header_t* tga_header = (tga_header_t*) wpaper;
-            dprintf("h = %d, w = %d\n", tga_header->h, tga_header->w);
-            display_bmp(0, 0, tga_header->h, tga_header->w, wpaper, true);
-        } else {
             fb_clear();
         }
-    }
     else if (!strcmp(argc, "time")){
         uint64_t ticks = get_ticks();
         printf("Current date and time: %s\n", rtc_datetime());
@@ -155,6 +147,8 @@ void shell_exec(char* cmd){
 }
 
 void shell_init(struct stivale2_struct *stivale2_struct){
+    printf("[SHELL] ");
+    printf_c(GREEN, " Initialized\n");
     printf_c(GREEN, "\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
     printf_c(GREEN, "Type help for a list of commands.\n");
     printf_c(GREEN, "\nksh> ");

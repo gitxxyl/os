@@ -24,13 +24,13 @@ bitmap_t bmp;
 static char* get_memory_type_string(int i);
 
 void pmm_init(struct stivale2_struct* stivale2_struct){
-
+    printf("[PHYSMM]");
     struct stivale2_struct_tag_memmap* mmap_tag;
     mmap_tag = (struct stivale2_struct_tag_memmap*) stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     assert(mmap_tag != NULL);
     for(uint64_t i = 0; i < mmap_tag->entries; i++){
         struct stivale2_mmap_entry cur = mmap_tag->memmap[i];
-        printf("[0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
+        dprintf("[0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
             cur.base, 
             cur.base + cur.length, 
             cur.length, 
@@ -39,8 +39,6 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
         if(cur.type == 1) available_memory += cur.length;
         if(cur.base + cur.length > highest_page) highest_page = cur.base + cur.length;
     }
-    printf("Total memory: 0x%08x\n", total_memory);
-    printf("Available memory: 0x%08x\n", available_memory);
 
     bmp.size = (available_memory / PAGE_SIZE) / 8;
 
@@ -49,14 +47,14 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
         struct stivale2_mmap_entry cur = mmap_tag->memmap[i];
         if(cur.type == 1 && cur.length > bmp.size){
             bmp.map = (uint8_t*)(cur.base);
-            printf("OG        : [0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
+            dprintf("OG        : [0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
                 cur.base, 
                 cur.base + cur.length, 
                 cur.length, 
                 get_memory_type_string(cur.type));
             cur.base += (bmp.size + (0x1000 - 1)) & ~(0x1000 - 1);
             cur.length -= (bmp.size + (0x1000 - 1)) & ~(0x1000 - 1);
-            printf("AFT BITMAP: [0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
+            dprintf("AFT BITMAP: [0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
                 cur.base, 
                 cur.base + cur.length, 
                 cur.length, 
@@ -66,7 +64,7 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
         }
     }
     memset(bmp.map, 0xFFFF, bmp.size);
-    printf("Bitmap of size %x bytes initialised at 0x%08x\n", bmp.size, bmp.map);
+    dprintf("Bitmap of size %x bytes initialised at 0x%08x\n", bmp.size, bmp.map);
 
     // test bitmap
     clear_bit(&bmp, 10);
@@ -82,7 +80,7 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
     for(uint64_t i = 0; i < mmap_tag->entries; i++){
         struct stivale2_mmap_entry cur = mmap_tag->memmap[i];
         if(cur.type == 1){
-            printf("FREE: [0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
+            dprintf("FREE: [0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
                 cur.base, 
                 cur.base + cur.length, 
                 cur.length, 
@@ -91,6 +89,9 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
         }
     }
     set_bit(&bmp, 0);
+    printf_c(GREEN, " Initialized\n");
+    dprintf("Total memory: 0x%08llx\n", total_memory);
+    dprintf("Available memory: 0x%08llx\n", available_memory);
 }
 
 void free_region(uint64_t base, uint64_t length){

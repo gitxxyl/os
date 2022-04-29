@@ -14,6 +14,7 @@ mcfg_t* mcfg = 0;
 
 void pci_init(struct stivale2_struct* stivale2_struct){
     // get and ensure validity of rsdp from bootloader
+    printf("[PCI]   ");
     struct stivale2_struct_tag_rsdp* rsdp_struct = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_RSDP_ID);
     assert(rsdp_struct != NULL);
     rsdp_t* rsdp = rsdp_struct->rsdp;
@@ -29,6 +30,7 @@ void pci_init(struct stivale2_struct* stivale2_struct){
     mcfg = (mcfg_t*) sdt_find(xsdt, "MCFG");
     assert(mcfg != NULL);
     for(int i = 0; i < 4; i++) dprintf("%c", mcfg->sdt_header.signature[i]);
+    printf_c(GREEN, " Initialized\n");
 }
 
 pci_device_header_t* pci_enumerate(mcfg_t* a_mcfg, uint16_t a_vendorid, uint16_t a_deviceid){

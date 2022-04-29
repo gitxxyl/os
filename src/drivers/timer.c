@@ -7,11 +7,13 @@
 #include <include/interrupts.h>
 #include <include/timer.h>
 #include <lib/port.h>
+#include <lib/printf.h>
 
 volatile uint64_t ticks = 0;
 void on_tick_handler();
 
 void timer_init(uint64_t frequency){
+    printf("[TIMER] ");
     uint16_t divisor = 1193180 / frequency;
     outb(0x43, 0x36);
 
@@ -22,6 +24,7 @@ void timer_init(uint64_t frequency){
     outb(0x40, hi);
 
     isr_install_handler(32, on_tick_handler);
+    printf_c(GREEN, " Initialized\n");
 }
 
 uint64_t get_ticks(){

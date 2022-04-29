@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <include/vfs.h>
+#include <thirdparty/stivale2.h>
 
 typedef struct initrd_header {
     uint32_t nfiles;
@@ -14,4 +15,4 @@ typedef struct initrd_file_header {
     uint32_t length;
 } initrd_file_header_t;
 
-fs_node_t* initrd_init(uint64_t);
+fs_node_t* initrd_init(struct stivale2_struct*);

@@ -59,7 +59,7 @@ override HEADER_DEPS := $(CFILES:.c=.d)
 .PHONY: all
 all: $(ISO)
 	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS)
-	@make clean -s
+# @make clean -s
 
 run: $(ISO)
 	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS)
@@ -70,8 +70,12 @@ gdb: $(ISO)
 	@make clean -s
 
 $(ISO): $(KERNEL)
+	@cp ~/Documents/cs/jamesmvfs/bateman.tga .
+	@cp ~/Documents/cs/jamesmvfs/test.txt .
+	@cp ~/Documents/cs/jamesmvfs/test2.txt .
+	@cp ~/Documents/cs/jamesmvfs/test3.txt .
 # modify this as ../make_initrd <source1 filename> <dest1 filename> <source1 filename> <dest1 filename> etc..
-	@../make_initrd
+	@../make_initrd test.txt test.txt test2.txt test2.txt test3.txt test3.txt bateman.tga bateman.tga 
 	@mkdir -p ../iso_root
 	@mv initrd.img ../iso_root
 	@git submodule update --remote

@@ -11,6 +11,7 @@
 #include <stddef.h>
 #include <include/framebuffer.h>
 #include <include/stivale_tag.h>
+#include <lib/assert.h>
 #include <lib/printf.h>
 #include <lib/string.h> 
 
@@ -26,13 +27,7 @@ void fb_changebg(uint32_t color);
 void graphics_init(struct stivale2_struct *stivale2_struct, uint32_t bgcolor, uint32_t fgcolor){
     struct stivale2_struct_tag_framebuffer* framebuffer_tag;
     framebuffer_tag = (struct stivale2_struct_tag_framebuffer*) stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
-    if (framebuffer_tag == NULL) { // check if framebuffer tag is there
-        for (;;) {
-            asm ("hlt");
-        }
-    }
-    dprintf("Framebuffer found at 0x%x\n", framebuffer_tag->framebuffer_addr);
-
+    assert(framebuffer_tag != NULL);
     fb.addr = framebuffer_tag->framebuffer_addr;
     fb.width = framebuffer_tag->framebuffer_width;
     fb.height = framebuffer_tag->framebuffer_height;
@@ -40,6 +35,8 @@ void graphics_init(struct stivale2_struct *stivale2_struct, uint32_t bgcolor, ui
     fb.pitch = framebuffer_tag->framebuffer_pitch;
     struct stivale2_struct_tag_terminal *terminal_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_TERMINAL_ID);
     term_write = (void*) terminal_tag->term_write;
+    printf("[TERM]  ");
+    printf_c(GREEN, " Initialized\n");
 }
 void fb_plotpixel(int32_t x, int32_t y, uint32_t color){
     size_t fb_index = y * (fb.pitch / 4) + x;

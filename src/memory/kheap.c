@@ -202,9 +202,11 @@ void free(void* ptr, heap_t* heap){
 }
 
 void heap_init(){
+    printf("[K_HEAP]");
     kheap = create_heap(KHEAP_START, 
                         KHEAP_START + (sizeof(void*) * HEAP_INDEX_SIZE) + KHEAP_INITIAL_SIZE, 
                         KHEAP_START + (sizeof(void*) * HEAP_INDEX_SIZE) + KHEAP_INITIAL_SIZE, 
                         true, 
                         true);
+    printf_c(GREEN, " Initialized\n");
 }
