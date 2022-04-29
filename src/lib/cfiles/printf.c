@@ -900,6 +900,17 @@ int dprintf_(const char* format, ...){
   return ret;
 }
 
+int dprintf_c_(char* color, const char* format, ...){
+  dprint(color);
+  va_list va;
+  va_start(va, format);
+  char buffer[1];
+  const int ret = _vsnprintf(_out_debug, buffer, (size_t)-1, format, va);
+  va_end(va);
+  dprint(RESET);
+  return ret;
+}
+
 
 int sprintf_(char* buffer, const char* format, ...)
 {

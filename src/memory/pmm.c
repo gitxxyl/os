@@ -28,6 +28,7 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
     struct stivale2_struct_tag_memmap* mmap_tag;
     mmap_tag = (struct stivale2_struct_tag_memmap*) stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     assert(mmap_tag != NULL);
+    dprintf_c(BLUE, "\n[PHYSMM] Memory Map Info\n");
     for(uint64_t i = 0; i < mmap_tag->entries; i++){
         struct stivale2_mmap_entry cur = mmap_tag->memmap[i];
         dprintf("[0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
@@ -47,18 +48,8 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
         struct stivale2_mmap_entry cur = mmap_tag->memmap[i];
         if(cur.type == 1 && cur.length > bmp.size){
             bmp.map = (uint8_t*)(cur.base);
-            dprintf("OG        : [0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
-                cur.base, 
-                cur.base + cur.length, 
-                cur.length, 
-                get_memory_type_string(cur.type));
             cur.base += (bmp.size + (0x1000 - 1)) & ~(0x1000 - 1);
             cur.length -= (bmp.size + (0x1000 - 1)) & ~(0x1000 - 1);
-            dprintf("AFT BITMAP: [0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
-                cur.base, 
-                cur.base + cur.length, 
-                cur.length, 
-                get_memory_type_string(cur.type));
             mmap_tag->memmap[i] = cur;
             break;
         }

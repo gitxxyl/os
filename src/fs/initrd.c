@@ -93,7 +93,8 @@ fs_node_t* initrd_init(struct stivale2_struct* stivale2_struct){
     initrd_dev->ptr = 0;
     initrd_dev->impl = 0;
 
-    dprintf("kmallocing %llx for %u files\n", sizeof(fs_node_t) * initrd_header->nfiles, initrd_header->nfiles);
+    dprintf_c(BLUE, "\n[INITRD] Info\n");
+    dprintf("No. of files: %u\nMemory allocated: 0x%llx\n", initrd_header->nfiles,  sizeof(fs_node_t) * initrd_header->nfiles);
     root_nodes = (fs_node_t*)kmalloc(sizeof(fs_node_t) * initrd_header->nfiles);
     num_root_nodes = initrd_header->nfiles;
 
@@ -112,7 +113,6 @@ fs_node_t* initrd_init(struct stivale2_struct* stivale2_struct){
         root_nodes[i].close = 0;
         root_nodes[i].impl = 0;
     }
-    dprintf("Initrd initialised.\n");
     printf_c(GREEN, " Initialized\n");
     return initrd_root;
 }

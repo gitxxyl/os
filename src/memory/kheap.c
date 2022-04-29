@@ -55,7 +55,8 @@ uint64_t contract(uint64_t size, heap_t* heap){
 }
 heap_t* create_heap(uint64_t start, uint64_t end, uint64_t max, bool us, bool rw){
     heap_t* heap = (heap_t*) kmalloc(sizeof(heap_t));
-    dprintf("start = %p, end = %p, max = %p\n", start, end, max);
+    dprintf_c(BLUE, "\n[HEAP] Info\n");
+    dprintf("Heap start address: 0x%p\nHeap end address: 0x%p\nHeap max size: 0x%p\n", start, end, max);
 
     assert(heap != 0);
     assert(start % PAGE_SIZE == 0);
@@ -76,7 +77,7 @@ heap_t* create_heap(uint64_t start, uint64_t end, uint64_t max, bool us, bool rw
     header_t* hole = (header_t*) start;
     hole->magic = HEAP_MAGIC;
     hole->size = end - start;
-    dprintf("Heap created at %p with initial hole size %llx\n", heap, hole->size);
+    dprintf("Heap address: 0x%p\nInitial hole size: 0x%llx\n", heap, hole->size);
     hole->hole = 1;
     insert_ordered_array((void*)hole, &heap->index);
 
@@ -89,6 +90,7 @@ void* alloc(uint64_t size, bool page_align, heap_t* heap){
     uint64_t realsize = size + sizeof(header_t) + sizeof(footer_t);
     int i = find_smallest_hole(realsize, page_align, heap);
     if(i == -1){
+        dprintf_c(RED, "Heap out of memory\n");
         dprintf("heap size: %d\n", heap->index.size);
         for(int j = 0; j < heap->index.size; j++){
             dprintf("[heap] %p, size = %llx\n", lookup_ordered_array(j, &heap->index), ((header_t*)lookup_ordered_array(j, &heap->index))->size);
@@ -128,8 +130,6 @@ void* alloc(uint64_t size, bool page_align, heap_t* heap){
         }
         insert_ordered_array((void*)hole_header, &heap->index);
     }
-
-    dprintf("ALLOCATED %p, %llx\n", block_header, block_header->size);
     return (void*) ((uint64_t) block_header + sizeof(header_t));
 }
 

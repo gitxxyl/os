@@ -22,14 +22,16 @@ void pci_init(struct stivale2_struct* stivale2_struct){
     // rsdp checks
     assert(rsdp != NULL);
     assert(strcmp(rsdp->signature, "RSD PTR ") != 0);
-    dprintf("RSDP found at %p with revision %d and oemID %s\n", rsdp, rsdp->revision, rsdp->oem_id);
+    dprintf_c(BLUE, "\n[PCI] Info\n");
+    char* oem_id;
+    strncpy(oem_id, rsdp->oem_id, 6);
+    dprintf("RSDP address: 0x%p\nACPI revision: %d\noemID: %s\n", rsdp, rsdp->revision, oem_id);
 
     sdt_t* xsdt = (sdt_t*)(rsdp->xsdtAddress);
     assert(xsdt != NULL);
     
     mcfg = (mcfg_t*) sdt_find(xsdt, "MCFG");
     assert(mcfg != NULL);
-    for(int i = 0; i < 4; i++) dprintf("%c", mcfg->sdt_header.signature[i]);
     printf_c(GREEN, " Initialized\n");
 }
 

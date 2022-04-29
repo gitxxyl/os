@@ -76,6 +76,9 @@ int printf_c_(char* color, const char* format, ...);
 #define dprintf dprintf_
 int dprintf_(const char* format, ...);
 
+#define dprintf_c dprintf_c_
+int dprintf_c_(char* color, const char* format, ...);
+
 
 /**
  * Tiny sprintf implementation

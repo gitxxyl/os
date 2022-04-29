@@ -79,7 +79,7 @@ void _start(struct stivale2_struct *stivale2_struct)
     pci_init(stivale2_struct);
     root = initrd_init(stivale2_struct);
     shell_init(stivale2_struct);
-    dprintf("\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
+    dprintf_c(GREEN, "\n\n[REDACTED]OS v0.3 booted successfully on Limine v%s\n", stivale2_struct->bootloader_version);
 
     asm("sti");
     for (;;) asm("hlt");

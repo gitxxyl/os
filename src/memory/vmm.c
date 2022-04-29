@@ -97,10 +97,11 @@ void vmm_init(struct stivale2_struct* stivale2_struct){
     uint64_t hhdm_virt = hhdm->addr;
 
     k_pml4 = (uint64_t*)pmm_alloc_pages(1);
-    dprintf("pml4: %p\n", k_pml4);
-    dprintf("kernel_base_phys: %llx\n", kernel_base_phys);
-    dprintf("kernel_base_virt: %llx\n", kernel_base_virt);
-    dprintf("hhdm_virt: %llx\n", hhdm_virt);
+    dprintf_c(BLUE, "\n[VIRTMM] INFO:\n");
+    dprintf("Kernel PML4 address: 0x%p\n", k_pml4);
+    dprintf("Kernel base address (in physical memory): 0x%llx\n", kernel_base_phys);
+    dprintf("Kernel base address (in virtual memory):  0x%llx\n", kernel_base_virt);
+    dprintf("Higher Half Direct Map Slide: 0x%llx\n", hhdm_virt);
 
     for (uint64_t i = 0; i < 0x200000; i += PAGE_SIZE){
         vmm_map_page(k_pml4, (uint64_t) i + kernel_base_phys, (uint64_t) i + kernel_base_virt, 0b11);
@@ -113,18 +114,16 @@ void vmm_init(struct stivale2_struct* stivale2_struct){
 
     struct stivale2_struct_tag_memmap* mmap_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     assert(mmap_tag != NULL);
-    dprintf("entries: %llx", mmap_tag->entries);
     for(uint64_t i = 0; i < mmap_tag->entries; i++){
         uint64_t base = mmap_tag->memmap[i].base;
         if(base < 0x4000000) continue;
-        dprintf("mapping extra");
         uint64_t length = mmap_tag->memmap[i].length;
         for(uint64_t j = 0; j < length; j += PAGE_SIZE){
             vmm_map_page(k_pml4, base + j, base + j, 0b11);
             vmm_map_page(k_pml4, base + j, base + j + HH_MEMORY, 0b11);
         }
     }
-    dprintf("pagetables_end = %p\n", pagetables_end);
+    dprintf("Address of last pagetable: 0x%llx\n\n", pagetables_end);
     load_pml4((uint64_t)k_pml4);
     isr_install_handler(0xE, pagefault_handler);
     printf_c(GREEN, " Initialized\n");
