@@ -11,9 +11,11 @@
 #include <lib/printf.h>
 #include <lib/assert.h>
 #include <lib/memory.h>
+#include <lib/panic.h>
 
 #include <include/memory.h>
 #include <include/paging.h>
+#include <include/interrupts.h>
 
 #include <stivale2.h>
 
@@ -73,6 +75,17 @@ void invlpg(uint64_t addr){
     }
 }
 
+void pagefault_handler(registers_t* regs){
+    uint64_t cr2;
+    asm volatile("mov %%cr2, %0" : "=r"(cr2));
+    uint64_t cr3;
+    asm volatile("mov %%cr3, %0" : "=r"(cr3));
+    printf_c(RED, "Page fault at %llx: ", cr2);
+    printf_c(RED, (regs->error_code & 0x01) ? "Present, " : "Non-present, ");
+    printf_c(RED, (regs->error_code & 0x02) ? "Write access, " : "Read access, ");
+    printf_c(RED, (regs->error_code & 0x04) ? "User" : "Kernel");
+}
+
 void vmm_init(struct stivale2_struct* stivale2_struct){
     printf("[VIRTMM]");
     struct stivale2_struct_tag_kernel_base_address* kernel_base_address = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_KERNEL_BASE_ADDRESS_ID);
@@ -113,6 +126,7 @@ void vmm_init(struct stivale2_struct* stivale2_struct){
     }
     dprintf("pagetables_end = %p\n", pagetables_end);
     load_pml4((uint64_t)k_pml4);
+    isr_install_handler(0xE, pagefault_handler);
     printf_c(GREEN, " Initialized\n");
 }
 

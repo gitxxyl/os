@@ -51,6 +51,7 @@ uint64_t isr_handler(uint64_t rsp){
         }
         else {
             dprintf("\nUnhandled interrupt: 0x%x with err code %x\n", regs->isr_number, regs->error_code);
+            printf_c(RED, "Unhandled interrupt: 0x%x with err code %x", regs->isr_number, regs->error_code);
             for(;;); // hang because the exception is unhandled
         }
 
