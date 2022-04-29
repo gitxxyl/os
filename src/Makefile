@@ -59,15 +59,12 @@ override HEADER_DEPS := $(CFILES:.c=.d)
 .PHONY: all
 all: $(KERNEL) $(ISO)
 	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS)
-	@make clean -s
 
 run: $(KERNEL) $(ISO)
 	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS)
-	@make clean -s
 
 gdb: $(KERNEL) $(ISO)
 	@qemu-system-x86_64 $(ISO) $(QEMUFLAGS) -s -S
-	@make clean -s
 
 $(ISO): $(KERNEL)
 	@cp ~/Documents/cs/jamesmvfs/bateman.tga .
@@ -88,6 +85,7 @@ $(ISO): $(KERNEL)
                 -efi-boot-part --efi-boot-image --protective-msdos-label \
                 ../iso_root -o $(ISO)
 	@../limine/limine-deploy $(ISO)
+	@make clean -s
 
 $(KERNEL): $(OBJ)
 	@$(LD) $(OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@
@@ -96,7 +94,7 @@ $(KERNEL): $(OBJ)
 	@nasm -felf64 $< -o $@
 
 # -include $(HEADER_DEPS)
-%.o: %.c stivale2.h
+%.o: %.c thirdparty/stivale2.h
 	@$(CC) $(CFLAGS) $(INTERNALCFLAGS) -c $< -o $@
 
 # Remove object files and the final executable.
