@@ -80,15 +80,15 @@ void shell_exec(char* cmd){
         }
     }
     else if (!strcmp(argc, "lspci")){
-        // pci_device_header_t* device_header = pci_enumerate(NULL, 0x8086, NULL);
-        // if(device_header->device_id != 0xFFFF && device_header->vendor_id != 0xFFFF){
-        //     printf("PCI DEVICE: %s / %s / %s / %s / %s\n",
-        //         GetVendorName(device_header->vendor_id),
-        //         GetDeviceName(device_header->vendor_id, device_header->device_id),
-        //         DeviceClasses[device_header->class],
-        //         GetSubclassName(device_header->class, device_header->subclass),
-        //         GetProgIFName(device_header->class, device_header->subclass, device_header->progif));
-        // }
+        pci_device_header_t* device_header = pci_enumerate(NULL, 0x8086, NULL);
+        if(device_header->device_id != 0xFFFF && device_header->vendor_id != 0xFFFF){
+            printf("PCI DEVICE: %s / %s / %s / %s / %s\n",
+                GetVendorName(device_header->vendor_id),
+                GetDeviceName(device_header->vendor_id, device_header->device_id),
+                DeviceClasses[device_header->class],
+                GetSubclassName(device_header->class, device_header->subclass),
+                GetProgIFName(device_header->class, device_header->subclass, device_header->progif));
+        }
     }
     else if (!strcmp(argc, "clear")){
         // fb_changebg(0x00);

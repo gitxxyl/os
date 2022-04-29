@@ -9,3 +9,4 @@ void keyboard_init();
 void vmm_init(struct stivale2_struct* stivale2_struct);
 void heap_init();
 void pci_init(struct stivale2_struct* stivale2_struct);
+void shell_init(struct stivale2_struct* stivale2_struct);
