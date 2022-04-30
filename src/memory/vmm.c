@@ -99,6 +99,7 @@ void pagefault_handler(registers_t* regs){
 
 void vmm_init(struct stivale2_struct* stivale2_struct){
     printf("[VIRTMM]");
+    isr_install_handler(0xE, pagefault_handler);
     struct stivale2_struct_tag_kernel_base_address* kernel_base_address = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_KERNEL_BASE_ADDRESS_ID);
     assert(kernel_base_address != NULL);
     uint64_t kernel_base_phys = kernel_base_address->physical_base_address;
@@ -127,17 +128,16 @@ void vmm_init(struct stivale2_struct* stivale2_struct){
     assert(mmap_tag != NULL);
     for(uint64_t i = 0; i < mmap_tag->entries; i++){
         uint64_t base = mmap_tag->memmap[i].base;
-        if(base < 0x4000000) continue;
+        if(base < 0x100000000) continue;
         uint64_t length = mmap_tag->memmap[i].length;
         for(uint64_t j = 0; j < length; j += PAGE_SIZE){
             vmm_map_page(k_pml4, base + j, base + j, 0b11, false);
-            vmm_map_page(k_pml4, base + j, base + j + HH_MEMORY, 0b11, false);
+            vmm_map_page(k_pml4, base + j, base + j + hhdm_virt, 0b11, false);
         }
     }
 
     dprintf("Address of last pagetable: 0x%llx\n\n", pagetables_end);
     load_pml4((uint64_t)k_pml4);
-    isr_install_handler(0xE, pagefault_handler);
     printf_c(GREEN, " Initialized\n");
 }
 

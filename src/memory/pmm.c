@@ -31,7 +31,7 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
     dprintf_c(BLUE_BOLD, "\n[PHYSMM] Memory Map Info\n");
     for(uint64_t i = 0; i < mmap_tag->entries; i++){
         struct stivale2_mmap_entry cur = mmap_tag->memmap[i];
-        dprintf("[0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
+        dprintf("[0x%016llx - 0x%016llx]: size 0x%016llx, type %s\n", 
             cur.base, 
             cur.base + cur.length, 
             cur.length, 
@@ -55,7 +55,7 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
         }
     }
     memset(bmp.map, 0xFFFF, bmp.size);
-    dprintf("Bitmap of size %x bytes initialised at 0x%08x\n", bmp.size, bmp.map);
+    dprintf("Bitmap of size %llx bytes initialised at 0x%016llx\n", bmp.size, bmp.map);
 
     // test bitmap
     clear_bit(&bmp, 10);
@@ -71,7 +71,7 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
     for(uint64_t i = 0; i < mmap_tag->entries; i++){
         struct stivale2_mmap_entry cur = mmap_tag->memmap[i];
         if(cur.type == 1){
-            dprintf("FREE: [0x%08x - 0x%08x]: size 0x%08x, type %s\n", 
+            dprintf("FREE: [0x%016llx - 0x%016llx]: size 0x%016llx, type %s\n", 
                 cur.base, 
                 cur.base + cur.length, 
                 cur.length, 
