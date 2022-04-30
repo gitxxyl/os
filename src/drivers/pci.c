@@ -22,7 +22,7 @@ void pci_init(struct stivale2_struct* stivale2_struct){
     // rsdp checks
     assert(rsdp != NULL);
     assert(strcmp(rsdp->signature, "RSD PTR ") != 0);
-    dprintf_c(BLUE, "\n[PCI] Info\n");
+    dprintf_c(BLUE_BOLD, "\n[PCI] Info\n");
     char* oem_id;
     strncpy(oem_id, rsdp->oem_id, 6);
     dprintf("RSDP address: 0x%p\nACPI revision: %d\noemID: %s\n", rsdp, rsdp->revision, oem_id);
@@ -52,7 +52,7 @@ pci_device_header_t* pci_enumerate_bus(uint64_t base_addr, uint8_t bus, uint16_t
     uint64_t bus_addr = base_addr + offset;
 
     // PCI bus uses MMIO - needs to be mapped 
-    vmm_map_page(k_pml4, bus_addr, bus_addr, 0b11);
+    vmm_map_page(k_pml4, bus_addr, bus_addr, 0b11, false);
 
     pci_device_header_t* device_header = (pci_device_header_t*)bus_addr;
     if(device_header->vendor_id == 0xFFFF || device_header->device_id == 0xFFFF || device_header->device_id == 0x0) return NULL;
@@ -67,7 +67,7 @@ pci_device_header_t* pci_enumerate_device(uint64_t bus_addr, uint8_t device, uin
     uint64_t offset = device << 15;
     uint64_t device_addr = bus_addr + offset;
 
-    vmm_map_page(k_pml4, device_addr, device_addr, 0b11);
+    vmm_map_page(k_pml4, device_addr, device_addr, 0b11, false);
 
     pci_device_header_t* device_header = (pci_device_header_t*)device_addr;
     if(device_header->vendor_id == 0xFFFF || device_header->device_id == 0xFFFF || device_header->device_id == 0x0) return NULL;
@@ -82,7 +82,7 @@ pci_device_header_t* pci_enumerate_function(uint64_t device_addr, uint8_t functi
     uint64_t offset = function << 12;
     uint64_t function_addr = device_addr + offset;
 
-    vmm_map_page(k_pml4, function_addr, function, 0b11);
+    vmm_map_page(k_pml4, function_addr, function, 0b11, false);
 
     pci_device_header_t* device_header = (pci_device_header_t*)function_addr;
     if(device_header->vendor_id == 0xFFFF || device_header->device_id == 0xFFFF || device_header->device_id == 0x0) return NULL;

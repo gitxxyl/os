@@ -93,7 +93,7 @@ fs_node_t* initrd_init(struct stivale2_struct* stivale2_struct){
     initrd_dev->ptr = 0;
     initrd_dev->impl = 0;
 
-    dprintf_c(BLUE, "\n[INITRD] Info\n");
+    dprintf_c(BLUE_BOLD, "\n[INITRD] Info\n");
     dprintf("No. of files: %u\nMemory allocated: 0x%llx\n", initrd_header->nfiles,  sizeof(fs_node_t) * initrd_header->nfiles);
     root_nodes = (fs_node_t*)kmalloc(sizeof(fs_node_t) * initrd_header->nfiles);
     num_root_nodes = initrd_header->nfiles;

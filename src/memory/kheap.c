@@ -55,7 +55,7 @@ uint64_t contract(uint64_t size, heap_t* heap){
 }
 heap_t* create_heap(uint64_t start, uint64_t end, uint64_t max, bool us, bool rw){
     heap_t* heap = (heap_t*) kmalloc(sizeof(heap_t));
-    dprintf_c(BLUE, "\n[HEAP] Info\n");
+    dprintf_c(BLUE_BOLD, "\n[HEAP] Info\n");
     dprintf("Heap start address: 0x%p\nHeap end address: 0x%p\nHeap max size: 0x%p\n", start, end, max);
 
     assert(heap != 0);

@@ -28,7 +28,7 @@ void pmm_init(struct stivale2_struct* stivale2_struct){
     struct stivale2_struct_tag_memmap* mmap_tag;
     mmap_tag = (struct stivale2_struct_tag_memmap*) stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     assert(mmap_tag != NULL);
-    dprintf_c(BLUE, "\n[PHYSMM] Memory Map Info\n");
+    dprintf_c(BLUE_BOLD, "\n[PHYSMM] Memory Map Info\n");
     for(uint64_t i = 0; i < mmap_tag->entries; i++){
         struct stivale2_mmap_entry cur = mmap_tag->memmap[i];
         dprintf("[0x%08x - 0x%08x]: size 0x%08x, type %s\n", 

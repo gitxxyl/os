@@ -97,7 +97,7 @@ void vmm_init(struct stivale2_struct* stivale2_struct){
     uint64_t hhdm_virt = hhdm->addr;
 
     k_pml4 = (uint64_t*)pmm_alloc_pages(1);
-    dprintf_c(BLUE, "\n[VIRTMM] INFO:\n");
+    dprintf_c(BLUE_BOLD, "\n[VIRTMM] INFO:\n");
     dprintf("Kernel PML4 address: 0x%p\n", k_pml4);
     dprintf("Kernel base address (in physical memory): 0x%llx\n", kernel_base_phys);
     dprintf("Kernel base address (in virtual memory):  0x%llx\n", kernel_base_virt);
