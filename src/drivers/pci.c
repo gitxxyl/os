@@ -7,6 +7,7 @@
 #include <lib/printf.h>
 #include <lib/string.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <thirdparty/stivale2.h>
 
 extern uint64_t* k_pml4;

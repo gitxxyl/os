@@ -1,6 +1,5 @@
 /**
  * Virtual Memory Manager - manage paging
- * FIXME: this doesn't really work, but that's okay
  * Using level 4 paging
  **/
 
@@ -32,20 +31,32 @@ uint64_t* vmm_get_pagetable(uint64_t* base, uint16_t offset, uint64_t flags){
     return (uint64_t*)(base[offset] & ~0xFFF); 
 }
 
-void vmm_map_page(uint64_t* map, uint64_t paddr, uint64_t vaddr, uint64_t flags){
-    //if(vaddr > HH_KERNEL || vaddr > HH_MEMORY) dprintf("%llx %llx\n", paddr, vaddr);
-    uint64_t pml4_index = (vaddr & ((uint64_t)0x1ff << 39)) >> 39;
-    uint64_t pdp_index  = (vaddr & ((uint64_t)0x1ff << 30)) >> 30;
-    uint64_t pd_index   = (vaddr & ((uint64_t)0x1ff << 21)) >> 21;
-    uint64_t pt_index   = (vaddr & ((uint64_t)0x1ff << 12)) >> 12;
-    
-    
-    uint64_t* pdp = vmm_get_pagetable((uint64_t*)map, pml4_index, 0b111);
-    uint64_t* pd = vmm_get_pagetable((uint64_t*)pdp, pdp_index, 0b111);
-    uint64_t* pt = vmm_get_pagetable((uint64_t*)pd, pd_index, 0b111);
+void vmm_map_page(uint64_t* map, uint64_t paddr, uint64_t vaddr, uint64_t flags, bool huge){
+    if(!huge){
+        uint64_t pml4_index = (vaddr & ((uint64_t)0x1ff << 39)) >> 39;
+        uint64_t pdp_index  = (vaddr & ((uint64_t)0x1ff << 30)) >> 30;
+        uint64_t pd_index   = (vaddr & ((uint64_t)0x1ff << 21)) >> 21;
+        uint64_t pt_index   = (vaddr & ((uint64_t)0x1ff << 12)) >> 12;
 
-    pt[pt_index] = ((uint64_t) paddr) | flags;
-    invlpg(vaddr);
+
+        uint64_t* pdp = vmm_get_pagetable((uint64_t*)map, pml4_index, 0b111);
+        uint64_t* pd = vmm_get_pagetable((uint64_t*)pdp, pdp_index, 0b111);
+        uint64_t* pt = vmm_get_pagetable((uint64_t*)pd, pd_index, 0b111);
+
+        pt[pt_index] = ((uint64_t) paddr) | flags;
+        invlpg(vaddr);
+    } else {
+        uint64_t pml4_index = (vaddr & ((uint64_t)0x1ff << 39)) >> 39;
+        uint64_t pdp_index  = (vaddr & ((uint64_t)0x1ff << 30)) >> 30;
+        uint64_t pd_index   = (vaddr & ((uint64_t)0x1ff << 21)) >> 21;
+        
+        uint64_t* pdp = vmm_get_pagetable((uint64_t*)map, pml4_index, 0b111);
+        uint64_t* pd = vmm_get_pagetable((uint64_t*)pdp, pdp_index, 0b111);
+
+        pd[pd_index] = ((uint64_t) paddr) | flags | (1 << 7);
+        invlpg(vaddr);
+        
+    }
 }
 
 uint64_t vmm_virtual_to_phys(uint64_t* map, uint64_t vaddr){
@@ -104,12 +115,12 @@ void vmm_init(struct stivale2_struct* stivale2_struct){
     dprintf("Higher Half Direct Map Slide: 0x%llx\n", hhdm_virt);
 
     for (uint64_t i = 0; i < 0x200000; i += PAGE_SIZE){
-        vmm_map_page(k_pml4, (uint64_t) i + kernel_base_phys, (uint64_t) i + kernel_base_virt, 0b11);
+        vmm_map_page(k_pml4, (uint64_t) i + kernel_base_phys, (uint64_t) i + kernel_base_virt, 0b11, false);
     }
     
-    for (uint64_t i = 0; i < 0x100000000; i += PAGE_SIZE){
-        vmm_map_page(k_pml4, i, (uint64_t) i, 0b11);
-        vmm_map_page(k_pml4, i, (uint64_t) i + HH_MEMORY, 0b11);
+    for (uint64_t i = 0; i < 0x100000000; i += HUGE_PAGE_SIZE){
+        vmm_map_page(k_pml4, i, (uint64_t) i, 0b11, true);
+        vmm_map_page(k_pml4, i, (uint64_t) i + hhdm_virt, 0b11, true);
     }
 
     struct stivale2_struct_tag_memmap* mmap_tag = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MEMMAP_ID);
@@ -119,10 +130,11 @@ void vmm_init(struct stivale2_struct* stivale2_struct){
         if(base < 0x4000000) continue;
         uint64_t length = mmap_tag->memmap[i].length;
         for(uint64_t j = 0; j < length; j += PAGE_SIZE){
-            vmm_map_page(k_pml4, base + j, base + j, 0b11);
-            vmm_map_page(k_pml4, base + j, base + j + HH_MEMORY, 0b11);
+            vmm_map_page(k_pml4, base + j, base + j, 0b11, false);
+            vmm_map_page(k_pml4, base + j, base + j + HH_MEMORY, 0b11, false);
         }
     }
+
     dprintf("Address of last pagetable: 0x%llx\n\n", pagetables_end);
     load_pml4((uint64_t)k_pml4);
     isr_install_handler(0xE, pagefault_handler);
