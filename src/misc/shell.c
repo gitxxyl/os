@@ -7,6 +7,7 @@
 #include <thirdparty/stivale2.h>
 #include <lib/assert.h>
 #include <include/vfs.h>
+#include <include/cpuid.h>
 #include <include/pci.h>
 #include <include/graphics.h>
 #include <include/init.h>
@@ -93,7 +94,18 @@ void shell_exec(char* cmd){
     else if (!strcmp(argc, "clear")){
         // fb_changebg(0x00);
             fb_clear();
-        }
+    }
+    else if (!strcmp(argc, "neofetch")){
+        printf(" ______    _______  ______   _______  _______  _______  _______  ______   _______  _______\n");
+        printf("|    _ |  |       ||      | |   _   ||       ||       ||       ||      | |       ||       |\n");
+        printf("|   | ||  |    ___||  _    ||  |_|  ||       ||_     _||    ___||  _    ||   _   ||  _____|\n");
+        printf("|   |_||_ |   |___ | | |   ||       ||       |  |   |  |   |___ | | |   ||  | |  || |_____ \n");
+        printf("|    __  ||    ___|| |_|   ||       ||      _|  |   |  |    ___|| |_|   ||  |_|  ||_____  |\n");
+        printf("|   |  | ||   |___ |       ||   _   ||     |_   |   |  |   |___ |       ||       | _____| |\n");
+        printf("|___|  |_||_______||______| |__| |__||_______|  |___|  |_______||______| |_______||_______|\n");        
+        detect_cpu();
+        printf("\033[40m    \033[41m    \033[42m    \033[43m    \n\033[44m    \033[45m    \033[46m    \033[47m    \033[0m\n");
+    }
     else if (!strcmp(argc, "time")){
         uint64_t ticks = get_ticks();
         printf("Current date and time: %s\n", rtc_datetime());
@@ -121,6 +133,7 @@ void shell_exec(char* cmd){
     else if (!strcmp(argc, "help")){
         printf("Commands:\n====================\n");
         printf("clear\n");
+        printf("neofetch\n");
         printf("time\n");
         printf("echo\n");
         printf("ls\n");
